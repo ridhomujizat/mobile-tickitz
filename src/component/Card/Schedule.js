@@ -8,7 +8,7 @@ function Schedule (props) {
   const navigation = useNavigation()
 
   const submitSchedule = () => {
-    navigation.navigate('Home')
+    navigation.navigate('Order')
   }
   return (
     <Wrapper style={props.style}>

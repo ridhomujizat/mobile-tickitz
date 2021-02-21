@@ -8,6 +8,7 @@ import SingnUp from './page/SignUp'
 import ForgetPassword from './page/FogetPassword'
 import Home from './page/Home'
 import DetailMovie from './page/DetailMovie'
+import Order from './page/Order'
 
 const Stack = createStackNavigator()
 
@@ -15,7 +16,7 @@ const App: () => React$Node = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ header: () => <Header /> }}>
-        <Stack.Screen component={SingnUp}
+        <Stack.Screen component={Order}
           options={{
             headerShown: false
           }}
@@ -34,6 +35,8 @@ const App: () => React$Node = () => {
           name='Home' />
         <Stack.Screen component={DetailMovie}
           name='DetailMovie' />
+        <Stack.Screen component={Order}
+          name='Order' />
       </Stack.Navigator>
     </NavigationContainer>
   )
