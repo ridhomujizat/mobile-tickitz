@@ -17,8 +17,8 @@ class DetailMovie extends Component {
   onChangeDate (event, selectedDate) {
     try {
       const currentDate = selectedDate || date;
-      this.setState({ date: currentDate })
       this.setState({ showDatePicker: false })
+      this.setState({ date: currentDate })
       this.setState({ onPressed: true })
     } catch {
       this.setState({ showDatePicker: false })

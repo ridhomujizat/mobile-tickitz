@@ -16,7 +16,7 @@ const App: () => React$Node = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ header: () => <Header /> }}>
-        <Stack.Screen component={Order}
+        <Stack.Screen component={SingnUp}
           options={{
             headerShown: false
           }}
