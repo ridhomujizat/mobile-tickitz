@@ -20,7 +20,7 @@ class Order extends Component {
     this.setState({ selectedSeat: [...selectedSeat, ...[id]] })
   }
   checkoutSlected () {
-    this.props.navigation.navigate('SignIn')
+    this.props.navigation.navigate('Payment')
   }
 
   render () {

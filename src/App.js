@@ -9,6 +9,8 @@ import ForgetPassword from './page/FogetPassword'
 import Home from './page/Home'
 import DetailMovie from './page/DetailMovie'
 import Order from './page/Order'
+import Payment from './page/Payment'
+import SignUp from './page/SignUp'
 
 const Stack = createStackNavigator()
 
@@ -16,7 +18,7 @@ const App: () => React$Node = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ header: () => <Header /> }}>
-        <Stack.Screen component={SingnUp}
+        <Stack.Screen component={SignUp}
           options={{
             headerShown: false
           }}
@@ -37,6 +39,8 @@ const App: () => React$Node = () => {
           name='DetailMovie' />
         <Stack.Screen component={Order}
           name='Order' />
+        <Stack.Screen component={Payment}
+          name='Payment' />
       </Stack.Navigator>
     </NavigationContainer>
   )
