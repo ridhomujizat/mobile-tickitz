@@ -19,6 +19,9 @@ class SignUp extends Component {
           <InputText
             label='Email'
             placeholder='Write your email'
+            autoCompleteType='email'
+            keyboardType='email-address'
+            textContentType='emailAddress'
           />
           <PasswordInput
             label='Password'

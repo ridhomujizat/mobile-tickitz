@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components/native'
 import Button from '../component/Button'
-import { InputText } from '../component/Form'
+import { InputText, InputPhoneNumber } from '../component/Form'
 import warning from '../assets/images/logo/warning.png'
 import gpay from '../assets/images/peyment-method/g-pay.png'
 import dana from '../assets/images/peyment-method/dana.png'
@@ -11,12 +11,14 @@ import gopay from '../assets/images/peyment-method/gopay.png'
 import ovo from '../assets/images/peyment-method/ovo.png'
 import visa from '../assets/images/peyment-method/visa.png'
 import paypal from '../assets/images/peyment-method/paypal.png'
-import { View } from 'native-base'
-import { TouchableOpacity } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 
 const PaymentMethod = [gpay, dana, bca, bri, gopay, ovo, visa, paypal]
 
 class Payment extends Component {
+  checkoutSlected () {
+    this.props.navigation.navigate('Ticket')
+  }
   render () {
     return (
       <Container>
@@ -66,7 +68,7 @@ class Payment extends Component {
               label='Email'
               placeholder='Write your email'
             />
-            <InputTextStyle
+            <InputPhoneStyle
               label='Phone Number'
               placeholder='Write your number'
             />
@@ -121,6 +123,10 @@ const ButtonCheckout = styled(Button)`
   margin-bottom: 20px
 `
 const InputTextStyle = styled(InputText)`
+  margin-bottom: 10px
+`
+
+const InputPhoneStyle = styled(InputPhoneNumber)`
   margin-bottom: 10px
 `
 const WarningWrapper = styled.View`

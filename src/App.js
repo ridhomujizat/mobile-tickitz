@@ -3,14 +3,14 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import Header from './component/Navigation/Header'
-import SignIn from './page/SingIn'
-import SingnUp from './page/SignUp'
-import ForgetPassword from './page/FogetPassword'
-import Home from './page/Home'
-import DetailMovie from './page/DetailMovie'
-import Order from './page/Order'
-import Payment from './page/Payment'
-import SignUp from './page/SignUp'
+import SignIn from './screen/SingIn'
+import ForgetPassword from './screen/FogetPassword'
+import Home from './screen/Home'
+import DetailMovie from './screen/DetailMovie'
+import Order from './screen/Order'
+import Payment from './screen/Payment'
+import SignUp from './screen/SignUp'
+import Ticket from './screen/ResultTicket'
 
 const Stack = createStackNavigator()
 
@@ -41,6 +41,8 @@ const App: () => React$Node = () => {
           name='Order' />
         <Stack.Screen component={Payment}
           name='Payment' />
+        <Stack.Screen component={Ticket}
+          name='Ticket' />
       </Stack.Navigator>
     </NavigationContainer>
   )

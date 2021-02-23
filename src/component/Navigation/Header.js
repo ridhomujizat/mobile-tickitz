@@ -1,16 +1,21 @@
 import React, { Component } from 'react'
 import styled from 'styled-components/native'
-import { TouchableOpacity, Text } from 'react-native'
+import { View } from 'react-native'
 import { LogoPurple } from '../Logo'
 import Menu from '../../assets/images/logo/menu.png'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 class Header extends Component {
   state = {
     headerShow: false
   }
+  navigateToMovie (value) {
+    console.log(value)
+    // this.props.navigation.navigate('Ticket')
+  }
   render () {
     return (
-      <Parent>
+      <>
         <Root>
           <LogoPurple width={'80px'} height={'40px'} />
           <TouchableOpacity onPress={() =>
@@ -21,19 +26,19 @@ class Header extends Component {
         </Root>
         {this.state.headerShow && (
           <MenuList>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => this.navigateToMovie('a')}>
               <ListRow>
                 <List>Movies</List>
               </ListRow>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <ListRow>
+            <TouchableOpacity onPress={() => this.navigateToMovie('b')}>
+              <ListRow >
                 <List>Cinemas</List>
               </ListRow>
             </TouchableOpacity>
           </MenuList>
         )}
-      </Parent>
+      </>
     )
   }
 }
@@ -47,20 +52,22 @@ const Root = styled.View`
   flex-direction: row
   padding-horizontal: 30px
   align-items: center
-  elevation: 4
+  elevation: 1
+  background-color: #fff
 `
 const ImageMenu = styled.Image`
   height: 35px
   width: 35px
 `
 const MenuList = styled.View`
-  width: 100%
-  position: absolute
-  top: 55px
   background-color: #fafafa
+  padding-vertical: 15px
+  position: absolute
+  width: 100%
+  top: 50px
 `
 const ListRow = styled.View`
-  height: 50px
+  padding: 5px
   width: 100%
 `
 const List = styled.Text`

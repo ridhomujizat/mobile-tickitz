@@ -9,6 +9,9 @@ function InputText (props) {
         onChangeText={props.onChangeText}
         value={props.value}
         placeholder={props.placeholder}
+        autoCompleteType={props.autoCompleteType}
+        email-address={props.keyboardType}
+        textContentType={props.textContentType}
       />
     </Row>
   )
