@@ -8,6 +8,8 @@ target 'MobileTickitz' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'react-native-spinkit', :path => '../node_modules/react-native-spinkit'
+
   target 'MobileTickitzTests' do
     inherit! :complete
     # Pods for testing

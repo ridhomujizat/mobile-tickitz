@@ -1,9 +1,31 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components/native'
 import { View, TouchableOpacity } from 'react-native'
 import { NowShowingCard } from '../component/Card'
+import http from '../helper/http'
+import Spinner from 'react-native-spinkit'
 
 function NowShowing () {
+  const [movie, setMovie] = useState([])
+  const [isLoading, stopLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData () {
+      const response = await http().get('movies?status=released')
+      await setMovie(response.data.pageInfo.results)
+      stopLoading(false)
+    }
+    fetchData()
+  }, [])
+
+  const renderItem = ({ item }) => (
+    <NowShowingCard
+      title={item.title}
+      image={item.image}
+      genre={item.genre}
+      slug={item.slug}
+    />
+  )
   return (
     <Row>
       <RowText>
@@ -16,12 +38,15 @@ function NowShowing () {
           </View>
         </TouchableOpacity>
       </RowText>
-      <ContainerCard horizontal={true}>
-        <NowShowingCard />
-        <NowShowingCard />
-        <NowShowingCard />
-        <PaddingRight />
-      </ContainerCard>
+      {isLoading
+        ? (<Spinner isVisible={true} size={50} type='Wave' color='#6E7191' />)
+        : (<ContainerCard
+          horizontal
+          data={movie}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderItem}
+          ListFooterComponent={<PaddingRight />}
+        />)}
     </Row>
   )
 }
@@ -45,7 +70,7 @@ const TextViewAll = styled(Text)`
   font-size: 14px
   font-family: Mulish-Medium
 `
-const ContainerCard = styled.ScrollView`
+const ContainerCard = styled.FlatList`
   padding-horizontal: 30px
 `
 const PaddingRight = styled.View`

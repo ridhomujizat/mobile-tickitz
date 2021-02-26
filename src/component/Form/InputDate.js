@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { View } from 'react-native'
 import Icon from '../../assets/images/logo/date.png'
 import Forward from '../../assets/images/logo/forward.png'
+import { parsingDMY } from '../../helper/date'
 
 function InputDate (props) {
   return (
@@ -12,7 +13,7 @@ function InputDate (props) {
         <Button>
           <Wrapper>
             <Image source={Icon} />
-            <Text>{!props.onPressed ? 'Set a Date' : props.date.toISOString().slice(0, 10)}</Text>
+            <Text>{!props.onPressed ? 'Set a Date' : parsingDMY(props.date)}</Text>
           </Wrapper>
           <ImageSmall source={Forward} />
         </Button>

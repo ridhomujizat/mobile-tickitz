@@ -1,36 +1,74 @@
 import React, { Component } from 'react'
 import styled from 'styled-components/native'
+
 import { LogoPurple } from '../component/Logo'
 import { InputText, InputPassword } from '../component/Form'
 import Button from '../component/Button'
 import { TouchableOpacity, View } from 'react-native'
-import google from '../assets/images/logo/google.png'
+import DimmedLoading from '../component/LoadingScreen/whiteLoading'
+import { showingMessage } from '../helper/flashMessage'
+
+import { connect } from 'react-redux'
+import { login } from '../redux/actions/auth'
 
 class SignIn extends Component {
+  state = {
+    email: '',
+    password: '',
+    isLoading: false
+  }
+  onChange (key, value) {
+    this.setState({ [key]: value })
+  }
+  async submitLogin () {
+
+    const { email, password } = this.state
+    this.setState({ isLoading: true })
+    await this.props.login(email, password)
+
+    if (this.props.auth.token) {
+      await showingMessage("Login Success", "Happy Wathcing", 'success')
+      this.setState({ isLoading: false })
+      this.props.navigation.navigate('Home')
+    } else {
+      await showingMessage("Login Failed", this.props.auth.errorMsg, 'danger')
+      this.setState({ isLoading: false })
+    }
+  }
   render () {
     return (
       <>
         <ContainerPage>
-          <LogoPurple width={'80px'} height={'40px'} />
-          <TitleLarge>Sign In</TitleLarge>
-          <InputText
-            label='Email'
-            placeholder='Write your email'
-          />
-          <PasswordInput
-            label='Password'
-            placeholder='Write your Password'
-          />
-          <Button>Sign In</Button>
-          <ForgetPasswordRow >
+          <View>
             <View>
-              <ForgetPasswordQue>Forgot your password?</ForgetPasswordQue>
+              <LogoPurple width={'80px'} height={'40px'} disabled />
+              <TitleLarge>Sign In</TitleLarge>
+              <InputText
+                label='Email'
+                placeholder='Write your email'
+                autoCompleteType='email'
+                keyboardType='email-address'
+                textContentType='emailAddress'
+                onChangeText={(email) => this.onChange('email', email)}
+              />
+              <PasswordInput
+                label='Password'
+                placeholder='Write your Password'
+                onChangeText={(password) => this.onChange('password', password)}
+              />
+              <Button onPress={() => this.submitLogin()}>Sign In</Button>
             </View>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('ForgetPassword')}>
-              <ForgetPasswordText> Reset now</ForgetPasswordText>
-            </TouchableOpacity>
-          </ForgetPasswordRow>
+            <ForgetPasswordRow >
+              <View>
+                <ForgetPasswordQue>Forgot your password?</ForgetPasswordQue>
+              </View>
+              <TouchableOpacity onPress={() => this.props.navigation.navigate('ForgetPassword')}>
+                <ForgetPasswordText> Reset now</ForgetPasswordText>
+              </TouchableOpacity>
+            </ForgetPasswordRow>
+          </View>
         </ContainerPage>
+        <DimmedLoading isLoading={this.state.isLoading} />
       </>
     )
   }
@@ -74,5 +112,9 @@ const ButtonQuickSign = styled.View`
  height: 48px
  box-shadow: 0 0 10px yellow;
 `
+const mapStateToPros = state => ({
+  auth: state.auth
+})
 
-export default SignIn
+const mapDispatchToProps = { login }
+export default connect(mapStateToPros, mapDispatchToProps)(SignIn)

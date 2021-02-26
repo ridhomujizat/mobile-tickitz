@@ -4,7 +4,7 @@ import styled from 'styled-components/native'
 import barcode from '../assets/images/barcode.png'
 function ResultTicket (props) {
   return (
-    <Container>
+    <Container showsVerticalScrollIndicator={false}>
       <Card>
         <BarcodeWrapper>
           <Barcode source={barcode} />

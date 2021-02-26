@@ -12,6 +12,7 @@ import ovo from '../assets/images/peyment-method/ovo.png'
 import visa from '../assets/images/peyment-method/visa.png'
 import paypal from '../assets/images/peyment-method/paypal.png'
 import { TouchableOpacity, View } from 'react-native'
+import Footer from '../component/Footer'
 
 const PaymentMethod = [gpay, dana, bca, bri, gopay, ovo, visa, paypal]
 
@@ -21,7 +22,7 @@ class Payment extends Component {
   }
   render () {
     return (
-      <Container>
+      <Container showsVerticalScrollIndicator={false}>
         <Wrapper space='20px'>
           <RowSpaceBetween >
             <TotalLabel>Total Payment</TotalLabel>
@@ -85,6 +86,7 @@ class Payment extends Component {
             radius={'5px '}
           >Checkout</ButtonCheckout>
         </ContainerWrapper>
+        <Footer />
       </Container>
     )
   }

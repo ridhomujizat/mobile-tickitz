@@ -1,25 +1,82 @@
 import React, { Component } from 'react'
 import styled from 'styled-components/native'
-import Avenger from '../assets/Avengers_Infinity_War_poster.jpg'
-import moment from 'moment';
 import { InputDate, InputLocation } from '../component/Form'
 import { SchduleCard } from "../component/Card";
-import Footer from '../layouts/Footer'
+import Footer from '../component/Footer'
+import http from '../helper/http'
+import { API_URL } from '@env'
+import { parsingDMY } from "../helper/date";
+import Loading from '../component/LoadingScreen'
+import Spinner from 'react-native-spinkit'
+import { FlatList, SafeAreaView } from 'react-native'
+import qs from 'querystring'
+import { connect } from 'react-redux'
 
 class DetailMovie extends Component {
   state = {
+    loadingMovie: true,
+    loadingCinemas: true,
     date: new Date(),
-    location: null,
+    idLocation: null,
     showDatePicker: false,
-    onPressed: false
+    onPressed: false,
+    movie: {},
+    cinemas: [],
+    errorMessage: null
+  }
+
+  async componentDidMount () {
+    const { slug } = this.props.route.params
+    try {
+      const resultMovie = await http().get(`/movies/${slug}`)
+      await this.setState({
+        movie: resultMovie.data.results
+      })
+      setTimeout(() => {
+        this.setState({ loadingMovie: false })
+
+      }, 600)
+    } catch (err) {
+      this.setState({ errorMessage: err.response.data.message })
+    }
+  }
+
+  async getSchedule () {
+    try {
+      const { idLocation, onPressed, date } = this.state
+      const newDate = date.toISOString().slice(0, 10)
+
+      const { slug } = this.props.route.params
+      const query = qs.stringify({ date: newDate, idLocation })
+      if (idLocation && onPressed) {
+        this.props.dispatch({ type: 'REMOVE_SCHEDULE' })
+
+        await this.setState({ errorMessage: null })
+        const response = await http().get(`/schedule/?slug=${slug}&${query}`)
+
+        await this.setState({ cinemas: response.data.results.cinema })
+        await setTimeout(() => {
+          this.setState({ loadingCinemas: false })
+        }, 500)
+      }
+    } catch (err) {
+      this.setState({ errorMessage: err.response.data.message })
+      setTimeout(() => {
+        this.setState({ loadingCinemas: false })
+      }, 500)
+    }
   }
 
   onChangeDate (event, selectedDate) {
     try {
       const currentDate = selectedDate || date;
-      this.setState({ showDatePicker: false })
-      this.setState({ date: currentDate })
-      this.setState({ onPressed: true })
+      this.setState({
+        showDatePicker: false,
+        date: currentDate,
+        onPressed: true,
+        loadingCinemas: true
+      })
+      this.getSchedule()
     } catch {
       this.setState({ showDatePicker: false })
     }
@@ -27,70 +84,96 @@ class DetailMovie extends Component {
   showPicker = () => {
     this.setState({ showDatePicker: true })
   }
-  showLocation = () => {
-  }
-  onChangeLocation = (value) => {
-    this.setState({ location: value })
+  onChangeLocation = async (value) => {
+    await this.setState({ idLocation: value })
+    this.getSchedule()
+    this.setState({ loadingCinemas: true })
   }
 
   render () {
+    const { showDatePicker, date, movie, loadingMovie, idLocation, onPressed, loadingCinemas, errorMessage, cinemas } = this.state
     return (
       <>
-        <Container>
+        <Loading isLoading={loadingMovie} />
+        <Container showsVerticalScrollIndicator={false} >
           <Wrapper>
             <ImageContainer>
-              <Image source={Avenger} />
+              <Image source={{ uri: `${API_URL}${movie.image}` }} />
             </ImageContainer>
-            <Title>Spider-Man: Homecoming</Title>
-            <Genre>Adventure, Action, Sci-Fi</Genre>
+            <Title>{movie.title}</Title>
+            <Genre>{movie.genre}</Genre>
             <ContentWrap>
               <ContentRow>
                 <Label>Release date</Label>
-                <Text>June 28, 2017</Text>
+                <Text>{parsingDMY(movie.releaseDate)}</Text>
               </ContentRow>
               <ContentRow>
                 <Label>Directed by</Label>
-                <Text>Jon Watss</Text>
+                <Text>{movie.directed}</Text>
               </ContentRow>
               <ContentRow>
                 <Label>Duratione</Label>
-                <Text>2 hrs 13 min</Text>
+                <Text>{movie.hour} hrs {movie.minute} min</Text>
               </ContentRow>
               <ContentRow>
                 <Label>Casts</Label>
-                <Text>
-                  Tom Holland,
-                  Robert Downey Jr.,
-                  etc.
-                </Text>
+                <Text>{movie.casts}</Text>
               </ContentRow>
             </ContentWrap>
             <SynopsisWrap>
               <Text>Synopsis</Text>
               <SynopsisText>
-                Thrilled by his experience with the Avengers, Peter returns home, where he lives with his Aunt May, under the watchful eye of his new mentor Tony Stark, Peter tries to fall back into his normal daily routine - distracted by thoughts of proving himself to be more than just your friendly neighborhood Spider-Man - but when the Vulture emerges as a new villain, everything that Peter holds most important will be threatened.
+                {movie.description}
               </SynopsisText>
             </SynopsisWrap>
           </Wrapper>
+          {movie.status === 'released' && (
+            <SelectSchedulWrap>
+              <ScheduleText>Showtimes and Tickets</ScheduleText>
+              <DatePicker
+                date={date}
+                onChange={(event, selectedDate) => this.onChangeDate(event, selectedDate)}
+                show={showDatePicker}
+                onPress={this.showPicker}
+                onPressed={onPressed}
+              />
+              <LocationPicker
+                onValueChange={(value) => this.onChangeLocation(value)}
+              />
+              {idLocation && onPressed
+                ? loadingCinemas
+                  ? (<ChooseFirst>
+                    <Spinner isVisible={true} size={50} type='Wave' color='#6E7191' />
+                  </ChooseFirst>)
+                  : errorMessage
+                    ? (<ChooseFirst>
+                      <TextChooseFirst>{errorMessage}</TextChooseFirst>
+                    </ChooseFirst>)
+                    : (<SelectScheduleWrapper>
+                      {cinemas.map(item => {
+                        return (
+                          <SchduleCard
+                            key={String(item.idCinema)}
+                            title={movie.title}
+                            image={item.image}
+                            idMovie={item.id}
+                            idCinema={item.idCinema}
+                            name={item.name}
+                            address={item.address}
+                            price={item.price}
+                            showTime={item.showTime}
+                            date={item.date}
+                          />
+                        )
+                      })}
+                    </SelectScheduleWrapper>)
+                : (<ChooseFirst>
+                  <TextChooseFirst>Choose date and location first</TextChooseFirst>
+                </ChooseFirst>)
+              }
 
-          <SelectSchedulWrap>
-            <ScheduleText>Showtimes and Tickets</ScheduleText>
-            <DatePicker
-              date={this.state.date}
-              onChange={(event, selectedDate) => this.onChangeDate(event, selectedDate)}
-              show={this.state.showDatePicker}
-              onPress={this.showPicker}
-              onPressed={this.state.onPressed}
-            />
-            <LocationPicker
-              onValueChange={(value) => this.onChangeLocation(value)}
-            />
-            <SelectScheduleWrapper>
-              <SchduleCard />
-              <SchduleCard />
-              <SchduleCard />
-            </SelectScheduleWrapper>
-          </SelectSchedulWrap>
+            </SelectSchedulWrap>
+          )}
           <Footer />
         </Container>
       </>
@@ -156,8 +239,7 @@ const SynopsisText = styled(Label)`
   margin-top: 15px
 `
 const SelectSchedulWrap = styled.View`
-  padding-horizontal: 30px
-  padding-vertical: 40px
+  padding: 30px
   background-color: #F5F6F8
 `
 const ScheduleText = styled.Text`
@@ -175,4 +257,14 @@ const SelectScheduleWrapper = styled.View`
   margin-vertical: 15px
   align-items: center
 `
-export default DetailMovie
+const ChooseFirst = styled.View`
+  padding: 30px
+  align-items: center
+`
+const TextChooseFirst = styled(Text)`
+  color: #A0A3BD
+`
+const mapStateToProps = (state) => ({
+  order: state.order
+})
+export default connect(mapStateToProps)(DetailMovie)

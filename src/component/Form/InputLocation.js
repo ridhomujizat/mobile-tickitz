@@ -1,11 +1,22 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components/native'
 import { View } from 'react-native'
 import Location from '../../assets/images/logo/location.png'
 import Forward from '../../assets/images/logo/forward.png'
 import RNPickerSelect from 'react-native-picker-select'
+import http from '../../helper/http'
 
 function InputLocation (props) {
+  const [location, setLocation] = useState([])
+
+  useEffect(() => {
+    async function fetchLocation () {
+      const response = await http().get('location')
+      setLocation(response.data.results)
+    }
+    fetchLocation()
+  }, [])
+
   return (
     <Container style={props.style} onPress={props.onPress}>
       <View>
@@ -36,10 +47,9 @@ function InputLocation (props) {
                 value: null
               }}
               Icon={() => { return <ImageSmall source={Forward} /> }}
-              items={[
-                { label: 'Jakarta', value: 'jakarta' },
-                { label: 'Karawang', value: 'Karawang' }
-              ]}
+              items={location.map(item => (
+                { label: item.name, value: item.id }
+              ))}
 
             />
           </SelectPicker>

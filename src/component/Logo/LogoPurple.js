@@ -11,7 +11,7 @@ const LogoPurple = (props) => {
     navigation.navigate('Home')
   }
   return (
-    <TouchableOpacity onPress={gotohome}>
+    <TouchableOpacity onPress={gotohome} disabled={props.disabled}>
       <ImageLogo source={Logo} height={height} width={width} />
     </TouchableOpacity>
   )

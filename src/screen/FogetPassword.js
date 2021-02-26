@@ -8,7 +8,7 @@ function ForgotPassword (props) {
   return (
     <>
       <ContainerPage>
-        <LogoPurple width={'80px'} height={'40px'} />
+        <LogoPurple width={'80px'} height={'40px'} disabled />
         <TitleLarge>Forgot Password</TitleLarge>
         <TextContent>we&apos;ll send a link to your email shortly</TextContent>
         <InputEmail

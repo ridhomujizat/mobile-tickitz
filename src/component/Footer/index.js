@@ -1,18 +1,18 @@
 import React from 'react'
 import styled from 'styled-components/native'
-import { LogoPurple } from '../component/Logo'
-import cineOne21 from '../assets/images/cinemas/cineOne21.png'
-import ebvid from '../assets/images/cinemas/ebv.id.png'
-import hiflix from '../assets/images/cinemas/hiflix.png'
-import ig from '../assets/images/logo/fa-ig.png'
-import fb from '../assets/images/logo/fa-fb.png'
-import yt from '../assets/images/logo/fa-yt.png'
-import tw from '../assets/images/logo/fa-tw.png'
+import { LogoPurple } from '../Logo'
+import cineOne21 from '../../assets/images/cinemas/cineOne21.png'
+import ebvid from '../../assets/images/cinemas/ebv.id.png'
+import hiflix from '../../assets/images/cinemas/hiflix.png'
+import ig from '../../assets/images/logo/fa-ig.png'
+import fb from '../../assets/images/logo/fa-fb.png'
+import yt from '../../assets/images/logo/fa-yt.png'
+import tw from '../../assets/images/logo/fa-tw.png'
 import { TouchableOpacity } from 'react-native'
 
-function Footer () {
+function Footer (props) {
   return (
-    <Row>
+    <Row withPadding={props.withPadding}>
       <BrandLogo>
         <LogoPurple height={'50px'} width={'80px'} />
         <Text>
@@ -40,7 +40,7 @@ function Footer () {
           Our Sponsor
         </MenuLabel>
         <RowMenu>
-          <TouchableOpacity>
+          <TouchableOpacity >
             <Image source={cineOne21} />
           </TouchableOpacity>
           <TouchableOpacity>
@@ -74,8 +74,9 @@ function Footer () {
 }
 
 const Row = styled.Text`
-  margin-top: 20px
-  padding-horizontal: 30px
+  margin-top: 50px
+  background-color: #fff
+  padding: 30px
 `
 const Text = styled.Text`
   font-family: Mulish-Medium
@@ -97,10 +98,10 @@ const RowMenu = styled.View`
   flex-wrap: wrap
 `
 const Image = styled.Image`
-  width: 100px
+  width: 70px
   height: 30px
   margin-top: 10px
-  margin-left: 10px
+  margin-right: 10px
   resizeMode: contain;
 `
 const TextMenu = styled(Text)`

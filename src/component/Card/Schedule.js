@@ -1,26 +1,50 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import styled from 'styled-components/native'
 import cinema from '../../assets/images/cinemas/hiflix.png'
 import Button from '../Button'
 import { useNavigation } from '@react-navigation/native'
+import { API_URL } from '@env'
+import { parsingDM } from '../../helper/date'
+
+import { connect } from 'react-redux'
+import { selectTime } from '../../redux/actions/order'
+
 function Schedule (props) {
   const navigation = useNavigation()
-
-  const submitSchedule = () => {
+  const selectDate = (value) => {
+    console.log(value)
+    return props.selectTime({
+      idSchedule: value.id,
+      time: value.time,
+      seat: value.seat
+    })
+  }
+  const bookNow = () => {
+    props.selectTime({
+      title: props.title,
+      idMovie: props.idMovie,
+      date: props.date,
+      imageCinema: props.image,
+      price: props.price,
+      cinemaName: props.name
+    })
     navigation.navigate('Order')
   }
   return (
     <Wrapper style={props.style}>
-      <Image source={cinema} />
-      <Address>Whatever street No.12, South Purwokerto</Address>
+      <ViewFlexRow>
+        <Image source={{ uri: `${API_URL}${props.image}` }} />
+        <Label>{parsingDM(props.date)}</Label>
+      </ViewFlexRow>
+      <Address>{props.address}</Address>
       <Hr />
       <TimesWrapper>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(item => {
+        {props.showTime.map(item => {
           return (
-            <TouchableOpacity key={String(item)}>
-              <TimeCol >
-                <Time>08.30</Time>
+            <TouchableOpacity onPress={() => selectDate(item)} key={String(item.id)} >
+              <TimeCol id={item.id} seat={props.order.idSchedule}>
+                <Time>{item.time.slice(0, 5)}</Time>
               </TimeCol>
             </TouchableOpacity>
           )
@@ -28,18 +52,20 @@ function Schedule (props) {
       </TimesWrapper>
       <ViewFlexRow>
         <PriceLabel>Price</PriceLabel>
-        <Price>$10.00/seat</Price>
+        <Label>{props.price}</Label>
       </ViewFlexRow>
       <ViewFlexRow>
         <Button
           radius={'5px'}
           height={'40px'}
-          onPress={submitSchedule}
+          onPress={bookNow}
+          disabled={props.order.idSchedule === null}
+          color={props.order.idSchedule === null && '#D8CCFA'}
         >Book Now</Button>
-        <Button
+        {/* <Button
           color={'transparent'}
           fontColor={'#5F2EEA'}
-        >Add to cart</Button>
+        >Add to cart</Button> */}
       </ViewFlexRow>
     </Wrapper>
   )
@@ -55,8 +81,7 @@ const Wrapper = styled.View`
   margin-bottom: 20px
 `
 const Image = styled.Image`
-  margin: auto
-  width: 150px
+  width: 110px
   height: 50px
   resizeMode: contain
 `
@@ -82,7 +107,9 @@ const TimesWrapper = styled.View`
 const TimeCol = styled.View`
   width: 60px
   height: 30px
-  margin-bottom: 10px
+  justify-content: center
+  ${props => props.seat === props.id && 'background-color: #DEDEDE'}
+  border-radius: 8px
 `
 const Time = styled.Text`
   font-family: Mulish-Medium
@@ -96,14 +123,19 @@ const ViewFlexRow = styled.View`
   align-items: center
 `
 const PriceLabel = styled.Text`
+
   font-family: Mulish-Medium
   font-size: 14px
   color: #4E4B66
-  margin-bottom: 20px
+  margin-vertical: 20px
 `
 
-const Price = styled(PriceLabel)`
+const Label = styled(PriceLabel)`
   font-family: Mulish-SemiBold
   font-size: 16px
 `
-export default Schedule
+const mapStateToProps = (state) => ({
+  order: state.order
+})
+const mapDispatchToProps = { selectTime }
+export default connect(mapStateToProps, mapDispatchToProps)(Schedule)

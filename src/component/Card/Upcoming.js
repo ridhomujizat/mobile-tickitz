@@ -1,25 +1,33 @@
 import React from 'react'
+import { useNavigation } from '@react-navigation/native'
 import styled from 'styled-components/native'
-import spider from '../../assets/Avengers_Infinity_War_poster.jpg'
 import Button from '../Button'
+import { API_URL } from '@env'
+import { View } from 'react-native'
 
 function UpcomingCard (props) {
+  const navigation = useNavigation()
   return (
     <ParentCard >
-      <RowImage>
-        <Image source={spider} />
-      </RowImage>
+      <View>
+        <RowImage>
+          <Image source={{ uri: `${API_URL}${props.image}` }} />
+        </RowImage>
+        <DetailCard >
+          <TitleMovie>{props.title}</TitleMovie>
+          <Genre>{props.genre}i</Genre>
+        </DetailCard>
+      </View>
       <DetailCard >
-        <TitleMovie>Spider-Man: Home Coming</TitleMovie>
-        <Genre>Action, Adventure,Sci-Fi</Genre>
         <ButtonBookNow
           radius={'4px'}
           height={'25px'}
           fontSize={'12px'}
-          color={'rgba(0,0,0,0)'}
+          color={'#fff'}
           fontColor={'#5F2EEA'}
           border={'solid 1px #5F2EEA'}
-        >Book Now</ButtonBookNow>
+          onPress={() => navigation.navigate('DetailMovie', { slug: props.slug })}
+        >Detail</ButtonBookNow>
       </DetailCard>
     </ParentCard >
 
@@ -31,7 +39,7 @@ const ParentCard = styled.View`
   border-radius: 8px
   width: 154px
   border: 1px #DEDEDE
-
+  justify-content: space-between
 `
 const Image = styled.Image`
     height: 185px;

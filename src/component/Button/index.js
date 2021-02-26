@@ -6,7 +6,8 @@ const Button = (props) => {
     <ButtonCostum
       onPress={props.onPress}
       radius={props.radius}
-      style={props.style}>
+      style={props.style}
+      disabled={props.disabled}>
       <ButtonStyle
         color={props.color}
         radius={props.radius}

@@ -14,7 +14,7 @@ class SignUp extends Component {
     return (
       <>
         <ContainerPage>
-          <LogoPurple width={'80px'} height={'40px'} />
+          <LogoPurple width={'80px'} height={'40px'} disabled />
           <TitleLarge>Sign Up</TitleLarge>
           <InputText
             label='Email'
