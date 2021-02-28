@@ -15,14 +15,28 @@ import { TouchableOpacity, View } from 'react-native'
 import Footer from '../component/Footer'
 import http from '../helper/http'
 import Loading from '../component/LoadingScreen'
-import ProcessLoading from '../component/LoadingScreen/whiteLoading'
-
+import { Formik } from 'formik'
+import * as Yup from 'yup'
 import { showingMessage } from '../helper/flashMessage'
 
 import { connect } from 'react-redux'
 import { updateTransaction } from '../redux/actions/order'
 
 const PaymentMethod = [gpay, dana, bca, bri, gopay, ovo, visa, paypal]
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, '*First Names must have at least 2 characters')
+    .max(50, '*First name must be less than 50 characters')
+    .required('*First name is required'),
+  email: Yup.string()
+    .email('*Must be a valid email address')
+    .max(50, '*Email must be less than 100 characters')
+    .required('*Email is required'),
+  phone: Yup.string()
+    .min(9, '*Phone number must have at least 9 characters')
+    .max(15, '*Phone number cant be longer than 10 characters')
+    .required('*Phone Number is required')
+})
 
 class Payment extends Component {
   state = {
@@ -33,6 +47,15 @@ class Payment extends Component {
       email: null
     },
     isLoading: true
+  }
+  onChange (key, value) {
+    this.setState({
+      profile:
+      {
+        ...this.state.profile,
+        [key]: value
+      }
+    })
   }
 
   componentDidMount () {
@@ -63,14 +86,13 @@ class Payment extends Component {
       this.setState({ isLoading: false })
     }
     fetchData()
-
   }
-  checkoutSlected = async () => {
+  checkoutSlected = async (value) => {
     const { id } = this.props.route.params
     const { token } = this.props.auth
     const data = this.state.profile
     this.setState({ isLoading: true })
-    await this.props.updateTransaction(token, id, data)
+    await this.props.updateTransaction(token, id, value)
     await this.orderResult()
 
   }
@@ -85,6 +107,7 @@ class Payment extends Component {
     }
   }
   render () {
+    const { auth } = this.props
     return (
       <>
         <Loading isLoading={this.state.isLoading} />
@@ -124,37 +147,81 @@ class Payment extends Component {
 
             </Wrapper>
           </ContainerWrapper>
-          <ContainerWrapper>
-            <Label>Personal Info</Label>
-            <Wrapper radius='16px' space='20px'>
-              <InputTextStyle
-                label='Full Name'
-                placeholder='Write your name'
-                value={this.state.profile.name}
-              />
-              <InputTextStyle
-                label='Email'
-                placeholder='Write your email'
-                value={this.state.profile.email}
-              />
-              <InputPhoneStyle
-                label='Phone Number'
-                placeholder='Write your number'
-                value={this.state.profile.phone}
-              />
-              <WarningWrapper>
-                <WarningIcon source={warning} />
-                <WarningText>Fill your data correctly.</WarningText>
-              </WarningWrapper>
-            </Wrapper>
-          </ContainerWrapper>
-          <ContainerWrapper>
-            <ButtonCheckout
-              onPress={() => this.checkoutSlected()}
-              height={'40px'}
-              radius={'5px '}
-            >Checkout</ButtonCheckout>
-          </ContainerWrapper>
+          <Formik
+            initialValues={{
+              name: auth.name !== 'Tickitzer' ? `${auth.name} ${auth.lastName}` : '',
+              email: auth.email,
+              phone: auth.phone ? auth.phone : ''
+            }}
+            validationSchema={validationSchema}
+            onSubmit={values => this.checkoutSlected(values)}
+          >
+            {(
+              {
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                isValid,
+                touched
+              }) => (
+              <>
+                <ContainerWrapper>
+                  <Label>Personal Info</Label>
+                  <Wrapper radius='16px' space='20px'>
+                    <InputTextStyle
+                      label='Full Name'
+                      placeholder='Write Your Full Name'
+                      value={values.name}
+                      onChangeText={handleChange('name')}
+                      onBlur={handleBlur('name')}
+                    />
+                    {errors.name && touched.name
+                      ? <TextError>{errors.name}</TextError>
+                      : null}
+                    <InputTextStyle
+                      label='Email'
+                      placeholder='Write your email'
+                      autoCompleteType='email'
+                      keyboardType='email-address'
+                      textContentType='emailAddress'
+                      value={values.email}
+                      onChangeText={handleChange('email')}
+                      onBlur={handleBlur('email')}
+                    />
+                    {errors.email && touched.email
+                      ? <TextError>{errors.email}</TextError>
+                      : null}
+                    <InputPhoneStyle
+                      label='Phone Number'
+                      placeholder='Write Your Number'
+                      value={values.phone}
+                      onChangeText={handleChange('phone')}
+                      onBlur={handleBlur('phone')}
+                    />
+                    {errors.phone
+                      ? <TextError>{errors.phone}</TextError>
+                      : null}
+                    <WarningWrapper>
+                      <WarningIcon source={warning} />
+                      <WarningText>Fill your data correctly.</WarningText>
+                    </WarningWrapper>
+                  </Wrapper>
+                </ContainerWrapper>
+                <ContainerWrapper>
+                  <ButtonCheckout
+                    onPress={() => this.checkoutSlected()}
+                    height={'40px'}
+                    radius={'5px '}
+                    onPress={handleSubmit}
+                    disabled={!isValid}
+                    color={!isValid || values.name === '' || values.phone === '' ? '#D8CCFA' : null}
+                  >Checkout</ButtonCheckout>
+                </ContainerWrapper>
+              </>
+            )}
+          </Formik>
           <Footer />
         </Container>
       </>
@@ -259,6 +326,11 @@ const OrText = styled.Text`
 `
 const ManulPayment = styled(OrText)`
   color: #5F2EEA
+`
+const TextError = styled.Text`
+  font-family: Mulish-Medium
+  font-size: 12px
+  color: red
 `
 const mapStateToProps = (state) => ({
   auth: state.auth,

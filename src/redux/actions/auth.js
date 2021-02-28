@@ -22,6 +22,7 @@ export const login = (email, password) => {
             name: resultProfile.data.results.firstName,
             lastName: resultProfile.data.results.lastName,
             image: resultProfile.data.results.image,
+            phone: resultProfile.data.results.phone,
             role: token.role,
             email: email
           }

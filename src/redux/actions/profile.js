@@ -10,9 +10,8 @@ export const updateProfile = (token, data) => {
       password
     } = data
     const form = new FormData()
-
-    const fullName = name.split(' ')
     if (name) {
+      const fullName = name.split(' ')
       if (fullName.length > 1) {
         form.append('firstName', fullName[0])
         form.append('lastName', fullName.splice(1, fullName.length).join(' '))
@@ -34,20 +33,24 @@ export const updateProfile = (token, data) => {
       form.append('image', image)
     }
     try {
-      const response = await http(token).post('profile', form)
+      const response = await http(token).patch('profile', form)
       console.log(response.data)
       dispatch({
-        name: response.data.result.firstName,
-        lastName: response.data.result.lastName,
-        image: response.data.result.image,
-        phone: response.data.result.phone
+        type: 'UPDATE_PROFILE',
+        payload: {
+          name: response.data.result.firstName,
+          lastName: response.data.result.lastName,
+          image: response.data.result.image,
+          phone: response.data.result.phone
+        }
       })
       dispatch({
-        type: 'SUCCESS_MESSAG',
+        type: 'SUCCESS_MESSAGE',
         payload: response.data.message
       })
     } catch (err) {
       const { message } = err.response.data
+      console.log(err)
       dispatch({
         type: 'SET_LOGIN_MESSAGE',
         payload: message

@@ -12,6 +12,7 @@ function InputText (props) {
         autoCompleteType={props.autoCompleteType}
         email-address={props.keyboardType}
         textContentType={props.textContentType}
+        onBlur={props.onBlur}
       />
     </Row>
   )

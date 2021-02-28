@@ -3,6 +3,7 @@ const initialState = {
   name: 'Tickitzer',
   lastName: '',
   image: 'uploads/profile/profile-default.jpg',
+  phone: '',
   role: null,
   email: null,
   message: '',
