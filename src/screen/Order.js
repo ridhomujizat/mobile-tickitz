@@ -27,7 +27,7 @@ class Order extends Component {
     const { sold } = this.state
     const checkSoldDate = async () => {
       const response = await http().get(`/transaction/seat/${idSchedule}`)
-      this.setState({ sold: response.data.result.map(item => item.seatSelected) })
+      this.setState({ sold: response.data.result })
 
     }
     checkSoldDate()
@@ -47,15 +47,16 @@ class Order extends Component {
   checkout = async () => {
     const data = this.props.order
     const { token } = this.props.auth
-    console.log(token)
     this.setState({ isLoading: true })
     this.showModal()
     await this.props.createTransaction(token, data)
-
+    await this.orderResult()
+  }
+  orderResult = () => {
     if (this.props.order.idTransaction) {
       showingMessage('Order Success', 'Please complate yout payment', 'success')
       this.setState({ isLoading: false })
-      this.props.navigation.navigate('Payment', { idTransaction: this.props.order.idTransaction })
+      this.props.navigation.navigate('Payment', { id: this.props.order.idTransaction })
     } else {
       this.setState({ isLoading: false })
       showingMessage('Order Failed', this.props.order.erroMsg)

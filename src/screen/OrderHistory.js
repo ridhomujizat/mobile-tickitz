@@ -1,41 +1,69 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Cinema from '../assets/images/cinemas/ebv.id.png'
 import Button from '../component/Button'
+import Footer from '../component/Footer'
+import http from '../helper/http'
+import { parsingDMY } from '../helper/date'
+import { useNavigation } from '@react-navigation/native'
+import { connect } from 'react-redux'
 
 function OrderHistor (props) {
+  const [dataHistory, setOrderHistory] = useState([])
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    const { token } = props.auth
+    async function response () {
+      const response = await http(token).get('/transaction/order-history/')
+      setOrderHistory(response.data.results)
+    }
+    response()
+  }, [])
   return (
-    <Container>
-      <Row>
+    <Container
+      data={dataHistory}
+      keyExtractor={(item, index) => String(index)}
+      ListFooterComponent={() => <Footer />}
+      renderItem={({ item }) => (
         <Card>
           <ImageCinema source={Cinema} />
-          <DateText>Tuesday, 07 July 2020 - 04:30pm</DateText>
-          <Title>Spider-Man: Homecoming</Title>
+          <DateText>{parsingDMY(item.date)}- {item.time.slice(0, 5)}</DateText>
+          <Title>{item.title}</Title>
           <Line />
-          <Button
-            height='40px'
-            radius='8px'
-            color='#00BA88'
-          >
-            Ticket in active
-          </Button>
+          {item.status === 'success'
+            ? (
+              <Button
+                height='40px'
+                radius='8px'
+                color='#00BA88'
+                onPress={() => navigation.navigate('Ticket', { id: item.id })}
+              >
+                Ticket in active
+              </Button>)
+            : (<Button
+              height='40px'
+              radius='8px'
+              color='#F4B740'
+              onPress={() => navigation.navigate('Payment', { id: item.id })}
+            >
+              Complate Your Payment
+            </Button>)}
         </Card>
-      </Row>
-    </Container>
+      )}
+    />
   )
 }
 
-const Container = styled.ScrollView`
+const Container = styled.FlatList`
   background-color: #D6D8E7
 `
-const Row = styled.View`
-  padding: 30px
-`
+
 const Card = styled.View`
   padding: 25px
   border-radius: 16px
-  width: 100%
   background-color: #fff
+  margin-: 20px
   margin-bottom: 20px
 `
 const ImageCinema = styled.Image`
@@ -59,4 +87,7 @@ const Line = styled.View`
   border: 0.5px #DEDEDE
   margin-vertical: 20px
 `
-export default OrderHistor
+const mapStateToProps = (state) => ({
+  auth: state.auth
+})
+export default connect(mapStateToProps)(OrderHistor)

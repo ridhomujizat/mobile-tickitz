@@ -13,81 +13,151 @@ import visa from '../assets/images/peyment-method/visa.png'
 import paypal from '../assets/images/peyment-method/paypal.png'
 import { TouchableOpacity, View } from 'react-native'
 import Footer from '../component/Footer'
+import http from '../helper/http'
+import Loading from '../component/LoadingScreen'
+import ProcessLoading from '../component/LoadingScreen/whiteLoading'
+
+import { showingMessage } from '../helper/flashMessage'
+
+import { connect } from 'react-redux'
+import { updateTransaction } from '../redux/actions/order'
 
 const PaymentMethod = [gpay, dana, bca, bri, gopay, ovo, visa, paypal]
 
 class Payment extends Component {
-  checkoutSlected () {
-    this.props.navigation.navigate('Ticket')
+  state = {
+    order: { total: 0 },
+    profile: {
+      name: null,
+      phone: null,
+      email: null
+    },
+    isLoading: true
+  }
+
+  componentDidMount () {
+    const { id } = this.props.route.params
+    const { token } = this.props.auth
+    const fetchData = async () => {
+      const order = await http(token).get(`/transaction/${id}`)
+      try {
+        const profile = await http(token).get('/profile')
+        this.setState({
+          profile: {
+            ...profile.data.results,
+            name: `${profile.data.results.firstName} ${profile.data.results.lastName}`
+          }
+        })
+      } catch (err) {
+        this.setState({
+          profile: this.state.profile
+        })
+      }
+      if (order.data.results.status === 'success') {
+        this.props.navigation.navigate('Profile')
+      }
+      await this.setState({
+        order: order.data.results,
+
+      })
+      this.setState({ isLoading: false })
+    }
+    fetchData()
+
+  }
+  checkoutSlected = async () => {
+    const { id } = this.props.route.params
+    const { token } = this.props.auth
+    const data = this.state.profile
+    this.setState({ isLoading: true })
+    await this.props.updateTransaction(token, id, data)
+    await this.orderResult()
+
+  }
+  orderResult = () => {
+    if (this.props.order.status === 'success') {
+      showingMessage('Payment Success', 'Thank you, your payment success', 'success')
+      this.setState({ isLoading: !this.state.isLoading })
+      this.props.navigation.navigate('Ticket', { id: this.props.order.idTransaction })
+    } else {
+      this.setState({ isLoading: !this.state.isLoading })
+      showingMessage('Payment Failed', this.props.order.erroMsg)
+    }
   }
   render () {
     return (
-      <Container showsVerticalScrollIndicator={false}>
-        <Wrapper space='20px'>
-          <RowSpaceBetween >
-            <TotalLabel>Total Payment</TotalLabel>
-            <Text>$30.00</Text>
-          </RowSpaceBetween>
-        </Wrapper>
-        <ContainerWrapper>
-          <Label>Payment Method</Label>
-          <Wrapper radius='16px' space='20px'>
-            <PaymentWrapper>
-              {PaymentMethod.map(item => {
-                return (
-                  <PaymentSelect key={item}>
-                    <Image source={item} />
-                  </PaymentSelect>
-
-                )
-              })}
-            </PaymentWrapper>
-            <HrWrape>
-              <Hr />
-              <OrText>Or</OrText>
-              <Hr />
-            </HrWrape>
-            <HrWrape>
-              <View>
-                <OrText>Pay via cash</OrText>
-              </View>
-              <TouchableOpacity>
-                <ManulPayment>See how it work</ManulPayment>
-              </TouchableOpacity>
-            </HrWrape>
-
+      <>
+        <Loading isLoading={this.state.isLoading} />
+        <Container showsVerticalScrollIndicator={false}>
+          <Wrapper space='20px'>
+            <RowSpaceBetween >
+              <TotalLabel>Total Payment</TotalLabel>
+              <Text>{this.state.order.total}</Text>
+            </RowSpaceBetween>
           </Wrapper>
-        </ContainerWrapper>
-        <ContainerWrapper>
-          <Label>Personal Info</Label>
-          <Wrapper radius='16px' space='20px'>
-            <InputTextStyle
-              label='Full Name'
-              placeholder='Write your name'
-            />
-            <InputTextStyle
-              label='Email'
-              placeholder='Write your email'
-            />
-            <InputPhoneStyle
-              label='Phone Number'
-              placeholder='Write your number'
-            />
-            <WarningWrapper>
-              <WarningIcon source={warning} />
-              <WarningText>Fill your data correctly.</WarningText>
-            </WarningWrapper>
-          </Wrapper>
-        </ContainerWrapper>
-        <ContainerWrapper>
-          <ButtonCheckout
-            onPress={() => this.checkoutSlected()}
-            height={'40px'}
-            radius={'5px '}
-          >Checkout</ButtonCheckout>
-        </ContainerWrapper>
-        <Footer />
-      </Container>
+          <ContainerWrapper>
+            <Label>Payment Method</Label>
+            <Wrapper radius='16px' space='20px'>
+              <PaymentWrapper>
+                {PaymentMethod.map(item => {
+                  return (
+                    <PaymentSelect key={item}>
+                      <Image source={item} />
+                    </PaymentSelect>
+
+                  )
+                })}
+              </PaymentWrapper>
+              <HrWrape>
+                <Hr />
+                <OrText>Or</OrText>
+                <Hr />
+              </HrWrape>
+              <HrWrape>
+                <View>
+                  <OrText>Pay via cash</OrText>
+                </View>
+                <TouchableOpacity>
+                  <ManulPayment>See how it work</ManulPayment>
+                </TouchableOpacity>
+              </HrWrape>
+
+            </Wrapper>
+          </ContainerWrapper>
+          <ContainerWrapper>
+            <Label>Personal Info</Label>
+            <Wrapper radius='16px' space='20px'>
+              <InputTextStyle
+                label='Full Name'
+                placeholder='Write your name'
+                value={this.state.profile.name}
+              />
+              <InputTextStyle
+                label='Email'
+                placeholder='Write your email'
+                value={this.state.profile.email}
+              />
+              <InputPhoneStyle
+                label='Phone Number'
+                placeholder='Write your number'
+                value={this.state.profile.phone}
+              />
+              <WarningWrapper>
+                <WarningIcon source={warning} />
+                <WarningText>Fill your data correctly.</WarningText>
+              </WarningWrapper>
+            </Wrapper>
+          </ContainerWrapper>
+          <ContainerWrapper>
+            <ButtonCheckout
+              onPress={() => this.checkoutSlected()}
+              height={'40px'}
+              radius={'5px '}
+            >Checkout</ButtonCheckout>
+          </ContainerWrapper>
+          <Footer />
+        </Container>
+      </>
     )
   }
 }
@@ -190,4 +260,9 @@ const OrText = styled.Text`
 const ManulPayment = styled(OrText)`
   color: #5F2EEA
 `
-export default Payment
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  order: state.order
+})
+const mapDispatchToProps = { updateTransaction }
+export default connect(mapStateToProps, mapDispatchToProps)(Payment)

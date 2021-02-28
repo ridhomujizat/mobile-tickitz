@@ -1,57 +1,81 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import styled from 'styled-components/native'
 import barcode from '../assets/images/barcode.png'
-function ResultTicket (props) {
-  return (
-    <Container showsVerticalScrollIndicator={false}>
-      <Card>
-        <BarcodeWrapper>
-          <Barcode source={barcode} />
-        </BarcodeWrapper>
+import { parsingDM } from '../helper/date'
+import { connect } from 'react-redux'
+import http from '../helper/http'
+import Loading from '../component/LoadingScreen'
 
-        <View>
-          <Rounded />
-          <RoundedLeft />
-        </View>
-        <WrapperTicketInfo>
-          <FlexRow>
-            <InfoWrapper>
-              <Label>Movie</Label>
-              <Text>Spider-Man: Homecoming</Text>
-            </InfoWrapper>
-            <InfoWrapper>
-              <Label>Category</Label>
-              <Text>PG-13</Text>
-            </InfoWrapper>
-          </FlexRow>
-          <FlexRow>
-            <InfoWrapper>
-              <Label>Date</Label>
-              <Text>07 Jul</Text>
-            </InfoWrapper>
-            <InfoWrapper>
-              <Label>Time</Label>
-              <Text>2:00pm</Text>
-            </InfoWrapper>
-          </FlexRow>
-          <FlexRow>
-            <InfoWrapper>
-              <Label>Count</Label>
-              <Text>3 pcs</Text>
-            </InfoWrapper>
-            <InfoWrapper>
-              <Label>Seats</Label>
-              <Text>C4, C5, C6</Text>
-            </InfoWrapper>
-          </FlexRow>
-          <FlexRowTotal>
-            <Text>Total</Text>
-            <Text>$30.00</Text>
-          </FlexRowTotal>
-        </WrapperTicketInfo>
-      </Card>
-    </Container>
+function ResultTicket (props) {
+  const [ticket, setTicket] = useState({
+    time: '',
+    title: '',
+    seatSelected: '',
+    total: '',
+    date: new Date(),
+    total: 0
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const { id } = props.route.params
+    const { token } = props.auth
+    async function fetchData () {
+      const resoponse = await http(token).get(`transaction/${id}`)
+      await setTicket(resoponse.data.results)
+      await setIsLoading(false)
+    }
+    fetchData()
+  }, [])
+  return (
+    <>
+      <Loading isLoading={isLoading} />
+      <Container showsVerticalScrollIndicator={false}>
+        <Card>
+          <BarcodeWrapper>
+            <Barcode source={barcode} />
+          </BarcodeWrapper>
+
+          <View>
+            <Rounded />
+            <RoundedLeft />
+          </View>
+          <WrapperTicketInfo>
+            <FlexRow>
+              <InfoWrapper>
+                <Label>Movie</Label>
+                <Text>{ticket.title}</Text>
+              </InfoWrapper>
+            </FlexRow>
+            <FlexRow>
+              <InfoWrapper>
+                <Label>Date</Label>
+                <Text>{parsingDM(ticket.date)}</Text>
+              </InfoWrapper>
+              <InfoWrapper>
+                <Label>Time</Label>
+                <Text>{ticket.time.slice(0, 5)}</Text>
+              </InfoWrapper>
+            </FlexRow>
+            <FlexRow>
+              <InfoWrapper>
+                <Label>Count</Label>
+                <Text>{ticket.seatSelected.split(',').length} pcs</Text>
+              </InfoWrapper>
+              <InfoWrapper>
+                <Label>Seats</Label>
+                <Text>{ticket.seatSelected}</Text>
+              </InfoWrapper>
+            </FlexRow>
+            <FlexRowTotal>
+              <Text>Total</Text>
+              <Text>{ticket.total}</Text>
+            </FlexRowTotal>
+          </WrapperTicketInfo>
+        </Card>
+      </Container>
+    </>
   )
 }
 
@@ -129,4 +153,7 @@ font-family: Mulish-SemiBold
 font-size: 12px
 color: #14142B
 `
-export default ResultTicket
+const mapStateToProps = (state) => ({
+  auth: state.auth
+})
+export default connect(mapStateToProps)(ResultTicket)
