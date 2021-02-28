@@ -5,6 +5,7 @@ import user from '../assets/images/user.jpeg'
 import { TouchableOpacity } from 'react-native'
 import { InputPassword, InputText, InputPhoneNumber } from '../component/Form'
 import Button from '../component/Button'
+import Footer from '../component/Footer'
 
 class UpdateProfile extends Component {
   render () {
@@ -71,6 +72,7 @@ class UpdateProfile extends Component {
             Update Changes
           </Button>
         </Row>
+        <Footer />
       </Container>
     )
   }
