@@ -36,7 +36,36 @@ export const createTransaction = (token, data) => {
       console.log(response.data.results[0].id)
       dispatch({
         type: 'CREATE_TRANSACTION',
-        payload: response.data.results[0].id
+        payload: response.data.results[0].id,
+        status: response.data.results[0].status
+      })
+    } catch (err) {
+      const { message } = err.response.data
+      dispatch({
+        type: 'TRANSACTION_MSG',
+        payload: message
+      })
+    }
+  }
+}
+export const updateTransaction = (token, id, data) => {
+  return async dispatch => {
+    const {
+      email,
+      phone,
+      name
+    } = data
+    const params = new URLSearchParams()
+    params.append('email', email)
+    params.append('phone', phone)
+    params.append('name', name)
+    try {
+      const response = await http(token).patch(`transaction/${id}`, params)
+      console.log(response)
+      dispatch({
+        type: 'CREATE_TRANSACTION',
+        payload: response.data.result.id,
+        status: response.data.result.status
       })
     } catch (err) {
       const { message } = err.response.data

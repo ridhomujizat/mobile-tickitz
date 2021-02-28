@@ -10,7 +10,8 @@ const initialState = {
   seatSelected: [],
   total: 0,
   idTransaction: null,
-  erroMsg: ''
+  erroMsg: '',
+  status: null
 }
 const orderReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -58,7 +59,8 @@ const orderReducer = (state = initialState, action) => {
     case 'CREATE_TRANSACTION': {
       return {
         ...state,
-        idTransaction: action.payload
+        idTransaction: action.payload,
+        status: action.status
       }
     }
     case 'TRANSACTION_MSG': {

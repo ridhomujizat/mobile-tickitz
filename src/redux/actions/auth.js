@@ -1,5 +1,5 @@
 import http from '../../helper/http'
-import jwt_decode from 'jwt-decode'
+import jwtDecode from 'jwt-decode'
 
 export const login = (email, password) => {
   return async dispatch => {
@@ -12,7 +12,7 @@ export const login = (email, password) => {
         payload: ''
       })
       const result = await http().post('login', params)
-      const token = jwt_decode(result.data.token)
+      const token = jwtDecode(result.data.token)
       try {
         const resultProfile = await http(result.data.token).get('profile')
         dispatch({
@@ -27,8 +27,6 @@ export const login = (email, password) => {
           }
         })
       } catch (err) {
-        console.log(result.data.token)
-        console.log(token)
         dispatch({
           type: 'LOGIN',
           payload: {
