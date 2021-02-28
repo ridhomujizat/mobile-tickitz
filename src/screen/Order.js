@@ -76,7 +76,7 @@ class Order extends Component {
           transparent={true}
           visible={this.state.modal}
         >
-          <ModalView style={{ backgorunColor: '#000', border: 6 }}>
+          <ModalView >
             <ConfirmationWrapper>
               <ScrollView>
                 <OrderInfo>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import styled from 'styled-components'
 import Cinema from '../assets/images/cinemas/ebv.id.png'
 import Button from '../component/Button'
@@ -11,6 +11,7 @@ import { connect } from 'react-redux'
 function OrderHistor (props) {
   const [dataHistory, setOrderHistory] = useState([])
   const navigation = useNavigation()
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     const { token } = props.auth
@@ -20,11 +21,20 @@ function OrderHistor (props) {
     }
     response()
   }, [])
+  const onRefresh = useCallback(async () => {
+    const { token } = props.auth
+    setRefreshing(true)
+    const response = await http(token).get('/transaction/order-history/')
+    setOrderHistory(response.data.results)
+    setRefreshing(false)
+  }, [])
   return (
     <Container
       data={dataHistory}
       keyExtractor={(item, index) => String(index)}
       ListFooterComponent={() => <Footer />}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
       renderItem={({ item }) => (
         <Card>
           <ImageCinema source={Cinema} />

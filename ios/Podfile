@@ -10,6 +10,8 @@ target 'MobileTickitz' do
 
   pod 'react-native-spinkit', :path => '../node_modules/react-native-spinkit'
 
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
   target 'MobileTickitzTests' do
     inherit! :complete
     # Pods for testing

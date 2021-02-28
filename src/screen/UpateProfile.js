@@ -4,6 +4,7 @@ import dot from '../assets/images/logo/dot.png'
 import user from '../assets/images/user.jpeg'
 import { TouchableOpacity, View } from 'react-native'
 import { InputPassword, InputText, InputPhoneNumber } from '../component/Form'
+import { Modal, ScrollView } from 'react-native'
 import Button from '../component/Button'
 import Footer from '../component/Footer'
 import Loading from '../component/LoadingScreen/whiteLoading'
@@ -13,6 +14,7 @@ import * as Yup from 'yup'
 import { API_URL } from '@env'
 import { connect } from 'react-redux'
 import { updateProfile } from '../redux/actions/profile'
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -30,11 +32,80 @@ const validationSchema = Yup.object().shape({
 })
 class UpdateProfile extends Component {
   state = {
-    isLoading: false
+    isLoading: false,
+    modal: false
   }
+
+  launchCamera = () => {
+    const { token } = this.props.auth
+    let options = {
+      quality: 0.3,
+    }
+    launchCamera(options, async (response) => {
+      console.log(response)
+      if (response.errorMessage) {
+        this.showModal()
+        showingMessage('Unable To Lauch Gallery', `${response.errorCode} ${response.errorMessage}`)
+      } else if (response.fileSize >= 500 * 1024) {
+        this.showModal()
+        showingMessage('Image To large', 'Please pick another image')
+      } else {
+        this.showModal()
+        await this.setState({ isLoading: true })
+        const image = {
+          uri: response.uri,
+          type: response.type,
+          name: response.fileName
+        }
+        try {
+          await this.props.updateProfile(token, { image })
+          await this.setState({ isLoading: false })
+          showingMessage('Profile Update success', 'Profile Picture update success', 'success')
+        } catch (err) {
+          console.log(err)
+          await this.setState({ isLoading: false })
+          showingMessage(`${form} failed to update`, this.props.auth.errorMsg)
+        }
+      }
+    })
+  }
+  launchGalery = () => {
+    const { token } = this.props.auth
+    let options = {
+      saveToPhotos: true,
+      mediaType: 'photo'
+    }
+    launchImageLibrary(options, async (response) => {
+      console.log(response)
+      if (response.errorMessage) {
+        this.showModal()
+        showingMessage('Unable To Lauch Gallery', `${response.errorCode} ${response.errorMessage}`)
+      } else if (response.fileSize >= 500 * 1024) {
+        this.showModal()
+        showingMessage('Image To large', 'Please choose another image')
+      } else {
+        this.showModal()
+        await this.setState({ isLoading: true })
+        const image = {
+          uri: response.uri,
+          type: response.type,
+          name: response.fileName
+        }
+        try {
+          await this.props.updateProfile(token, { image })
+          await this.setState({ isLoading: false })
+          showingMessage('Profile Update success', 'Profile Picture update success', 'success')
+        } catch (err) {
+          console.log(err)
+          await this.setState({ isLoading: false })
+          showingMessage(`${form} failed to update`, this.props.auth.errorMsg)
+        }
+      }
+    })
+  }
+
   updateProfile = async (values, form) => {
     const { token } = this.props.auth
-    console.log(values)
     this.setState({ isLoading: true })
     try {
       await this.props.updateProfile(token, values)
@@ -68,23 +139,60 @@ class UpdateProfile extends Component {
     return errors
   }
 
+  showModal () {
+    this.setState({ modal: !this.state.modal })
+  }
+
   render () {
     const { auth } = this.props
     return (
       <>
         <Loading isLoading={this.state.isLoading} />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.modal}
+          onRequestClose={() => {
+            this.showModal()
+          }}
+        >
+          <ModalView>
+            <ConfirmationWrapper>
+              <PickCamera>
+                <TextTitle>Update Profile Picture</TextTitle>
+                <BottomPicker
+                  height='45px'
+                  radius='8px'
+                  color='#f2f2f2'
+                  fontColor='#000'
+                  onPress={() => this.launchCamera()}
+                > Camera </BottomPicker>
+                <BottomPicker
+                  height='45px'
+                  radius='8px'
+                  color='#f2f2f2'
+                  fontColor='#000'
+                  onPress={() => this.launchGalery()}
+                > Galery </BottomPicker>
+                <BottomPicker
+                  height='45px'
+                  radius='8px'
+                  color='#ff7570'
+                > Delete Profile Picture </BottomPicker>
+              </PickCamera>
+            </ConfirmationWrapper>
+          </ModalView>
+        </Modal>
         <Container>
           <Row>
             <Card>
               <FlexRow>
                 <Title>Info</Title>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => this.showModal()}>
                   <Icon source={dot} />
                 </TouchableOpacity>
               </FlexRow>
-              <TouchableOpacity>
-                <ProfilePicture source={{ uri: `${API_URL}${auth.image}` }} />
-              </TouchableOpacity>
+              <ProfilePicture source={{ uri: `${API_URL}${auth.image}` }} />
               <NameText>{`${auth.name} ${auth.lastName}`}</NameText>
               <UserRank>Moviegoers</UserRank>
               <Line />
@@ -320,6 +428,30 @@ const TextError = styled.Text`
   font-family: Mulish-Medium
   font-size: 12px
   color: red
+`
+const ModalView = styled.View`
+  flex: 1
+  justify-content: flex-end
+  align-items: center
+  background-color: rgba(0,0,0,0.5)
+`
+const ConfirmationWrapper = styled.View`
+  width: 100%
+  background-color: #fff
+  borderTopLeftRadius: 16px
+  borderTopRightRadius: 16px
+`
+const PickCamera = styled.ScrollView`
+  padding: 30px
+`
+const TextTitle = styled.Text`
+  font-family: Mulish-SemiBold
+  font-size: 20px
+  margin-bottom: 20px
+  text-align: center
+`
+const BottomPicker = styled(Button)`
+  margin-vertical: 5px
 `
 const mapStateToProps = (state) => ({
   auth: state.auth
