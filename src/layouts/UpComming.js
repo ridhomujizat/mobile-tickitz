@@ -6,11 +6,13 @@ import Button from '../component/Button'
 import { MonthUpComing } from '../helper/date'
 import http from '../helper/http'
 import Spinner from 'react-native-spinkit'
+import { useNavigation } from '@react-navigation/native'
 
 function NowShowing () {
   const [movie, setMovie] = useState([])
   const [month] = useState(MonthUpComing(6))
   const [isLoading, stopLoading] = useState(true)
+  const navigation = useNavigation()
 
   useEffect(() => {
     async function fetchData () {
@@ -42,7 +44,7 @@ function NowShowing () {
         <View>
           <Text>Upcoming Movies</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ViewAll', { status: 'upcoming' })} >
           <View>
             <TextViewAll>View All</TextViewAll>
           </View>
@@ -51,7 +53,7 @@ function NowShowing () {
       <ContainerCard
         horizontal
         data={month}
-        keyExtractor={(item) => String(item)}
+        keyExtractor={(item, index) => String(index)}
         renderItem={renderButton}
         ListFooterComponent={<PaddingRight />}
       />

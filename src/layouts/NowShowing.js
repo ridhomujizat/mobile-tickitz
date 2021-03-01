@@ -4,10 +4,12 @@ import { View, TouchableOpacity } from 'react-native'
 import { NowShowingCard } from '../component/Card'
 import http from '../helper/http'
 import Spinner from 'react-native-spinkit'
+import { useNavigation } from '@react-navigation/native'
 
 function NowShowing () {
   const [movie, setMovie] = useState([])
   const [isLoading, stopLoading] = useState(true)
+  const navigation = useNavigation()
 
   useEffect(() => {
     async function fetchData () {
@@ -32,7 +34,7 @@ function NowShowing () {
         <View>
           <Text>Now Showing</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ViewAll', { status: 'released' })}>
           <View>
             <TextViewAll>ViewAll</TextViewAll>
           </View>
