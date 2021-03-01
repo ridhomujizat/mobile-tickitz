@@ -45,35 +45,63 @@ class ViewAll extends Component {
     await this.setState({ page: page + 1 })
   }
 
-  changeSort () {
-    const { sort, sortValue } = this.state
+  async changeSort () {
+    const { sort, sortValue } = await this.state
+    console.log(sort)
     if (sortValue === 'title') {
       if (sort === 'ASC') {
-        this.setState({ sort: 'DESC' })
         let sortData
-        sortData = this.state.movies.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
-      } else {
-        let sortData
-        this.setState({ sort: 'ASC' })
+        await this.setState({ sort: 'DESC' })
         sortData = this.state.movies.sort((a, b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0))
-      }
-    } else if (sort === 'DESC') {
-      if (sort === 'ASC') {
-        this.setState({ sort: 'DESC' })
-        let sortData
-        sortData = this.state.movies.sort((a, b) => (a.releaseDate > b.releaseDate) ? 1 : ((b.releaseDate > a.releaseDate) ? -1 : 0))
+        this.setState({ movies: sortData })
       } else {
         let sortData
-        this.setState({ sort: 'ASC' })
+        await this.setState({ sort: 'ASC' })
+        sortData = this.state.movies.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+        this.setState({ movies: sortData })
+      }
+    } else if (sortValue === 'releaseDate') {
+      if (sort === 'ASC') {
+        let sortData
+        await this.setState({ sort: 'DESC' })
         sortData = this.state.movies.sort((a, b) => (a.releaseDate < b.releaseDate) ? 1 : ((b.releaseDate < a.releaseDate) ? -1 : 0))
+        this.setState({ movies: sortData })
+      } else {
+        let sortData
+        await this.setState({ sort: 'ASC' })
+        sortData = this.state.movies.sort((a, b) => (a.releaseDate > b.releaseDate) ? 1 : ((b.releaseDate > a.releaseDate) ? -1 : 0))
+        this.setState({ movies: sortData })
       }
     }
 
   }
 
-  sort (value) {
-    this.setState({ sortValue: value })
+  async sort (value) {
+    await this.setState({ sortValue: value })
     console.log(this.state.sortValue)
+    const { sort, sortValue } = await this.state
+
+    if (sortValue === 'title') {
+      if (sort === 'ASC') {
+        let sortData
+        sortData = this.state.movies.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+        this.setState({ movies: sortData })
+      } else {
+        let sortData
+        sortData = this.state.movies.sort((a, b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0))
+        this.setState({ movies: sortData })
+      }
+    } else if (sortValue === 'releaseDate') {
+      if (sort === 'ASC') {
+        let sortData
+        sortData = this.state.movies.sort((a, b) => (a.releaseDate > b.releaseDate) ? 1 : ((b.releaseDate > a.releaseDate) ? -1 : 0))
+        this.setState({ movies: sortData })
+      } else {
+        let sortData
+        sortData = this.state.movies.sort((a, b) => (a.releaseDate < b.releaseDate) ? 1 : ((b.releaseDate < a.releaseDate) ? -1 : 0))
+        this.setState({ movies: sortData })
+      }
+    }
 
   }
   render () {
@@ -106,7 +134,7 @@ class ViewAll extends Component {
                 }}
                 items={[
                   { label: 'Title', value: 'title' },
-                  { label: 'Release Date', value: 'ReleaseDate' }
+                  { label: 'Release Date', value: 'releaseDate' }
                 ]}
                 onValueChange={value => {
                   this.sort(value)
@@ -122,7 +150,7 @@ class ViewAll extends Component {
           data={this.state.movies}
           keyExtractor={(item, index) => String(index)}
           onEndReached={() => this.nextPage()}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0.1}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => this.props.navigation.navigate('DetailMovie', { slug: item.slug })}

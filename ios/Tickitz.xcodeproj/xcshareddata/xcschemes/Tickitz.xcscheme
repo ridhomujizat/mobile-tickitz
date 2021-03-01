@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "MobileTickitz.app"
-               BlueprintName = "MobileTickitz"
-               ReferencedContainer = "container:MobileTickitz.xcodeproj">
+               BuildableName = "Tickitz.app"
+               BlueprintName = "Tickitz"
+               ReferencedContainer = "container:Tickitz.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MobileTickitzTests.xctest"
-               BlueprintName = "MobileTickitzTests"
-               ReferencedContainer = "container:MobileTickitz.xcodeproj">
+               BuildableName = "TickitzTests.xctest"
+               BlueprintName = "TickitzTests"
+               ReferencedContainer = "container:Tickitz.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MobileTickitz.app"
-            BlueprintName = "MobileTickitz"
-            ReferencedContainer = "container:MobileTickitz.xcodeproj">
+            BuildableName = "Tickitz.app"
+            BlueprintName = "Tickitz"
+            ReferencedContainer = "container:Tickitz.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MobileTickitz.app"
-            BlueprintName = "MobileTickitz"
-            ReferencedContainer = "container:MobileTickitz.xcodeproj">
+            BuildableName = "Tickitz.app"
+            BlueprintName = "Tickitz"
+            ReferencedContainer = "container:Tickitz.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -46,6 +46,8 @@ class UpdateProfile extends Component {
       if (response.errorMessage) {
         this.showModal()
         showingMessage('Unable To Lauch Gallery', `${response.errorCode} ${response.errorMessage}`)
+      } else if (response.didCancel) {
+        console.log('cancel')
       } else if (response.fileSize >= 500 * 1024) {
         this.showModal()
         showingMessage('Image To large', 'Please pick another image')
@@ -80,6 +82,8 @@ class UpdateProfile extends Component {
       if (response.errorMessage) {
         this.showModal()
         showingMessage('Unable To Lauch Gallery', `${response.errorCode} ${response.errorMessage}`)
+      } else if (response.didCancel) {
+        console.log('cancel')
       } else if (response.fileSize >= 500 * 1024) {
         this.showModal()
         showingMessage('Image To large', 'Please choose another image')

@@ -7,6 +7,7 @@ import http from '../helper/http'
 import { parsingDMY } from '../helper/date'
 import { useNavigation } from '@react-navigation/native'
 import { connect } from 'react-redux'
+import { API_URL } from '@env'
 
 function OrderHistor (props) {
   const [dataHistory, setOrderHistory] = useState([])
@@ -37,7 +38,7 @@ function OrderHistor (props) {
       onRefresh={onRefresh}
       renderItem={({ item }) => (
         <Card>
-          <ImageCinema source={Cinema} />
+          <ImageCinema source={{ uri: `${API_URL}${item.image}` }} />
           <DateText>{parsingDMY(item.date)}- {item.time.slice(0, 5)}</DateText>
           <Title>{item.title}</Title>
           <Line />
