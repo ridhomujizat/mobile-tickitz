@@ -18,7 +18,7 @@ import Loading from '../component/LoadingScreen'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { showingMessage } from '../helper/flashMessage'
-
+import PushNotification from 'react-native-push-notification'
 import { connect } from 'react-redux'
 import { updateTransaction } from '../redux/actions/order'
 
@@ -100,6 +100,11 @@ class Payment extends Component {
     if (this.props.order.status === 'success') {
       showingMessage('Payment Success', 'Thank you, your payment success', 'success')
       this.setState({ isLoading: !this.state.isLoading })
+      PushNotification.localNotification({
+        channelId: 'ticket',
+        title: 'Payment successfully',
+        message: 'Enjoy the movie'
+      })
       this.props.navigation.navigate('Ticket', { id: this.props.order.idTransaction })
     } else {
       this.setState({ isLoading: !this.state.isLoading })

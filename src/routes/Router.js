@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import Header from '../component/Header'
@@ -12,13 +12,19 @@ import SignUp from '../screen/SignUp'
 import Ticket from '../screen/ResultTicket'
 import Profile from '../screen/Profile'
 import ViewAll from '../screen/ViewAll'
-
+import SplashScreen from 'react-native-splash-screen'
 import { connect } from 'react-redux'
 
 const Stack = createStackNavigator()
 
 function Router (props) {
   const { token } = props.auth
+
+  useEffect(() => {
+    setTimeout(() => {
+      SplashScreen.hide()
+    }, 2000)
+  }, [])
   return (
     <Stack.Navigator screenOptions={{ header: () => <Header /> }}>
       { token === null && (

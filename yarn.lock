@@ -6094,6 +6094,11 @@ react-native-picker-select@^8.0.4:
     "@react-native-picker/picker" "^1.8.3"
     lodash.isequal "^4.5.0"
 
+react-native-push-notification@^7.2.2:
+  version "7.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-push-notification/-/react-native-push-notification-7.2.2.tgz#19cd567744616d0347097eea5ce9aa49dec4a975"
+  integrity sha512-c/APy4vvhzYBh5ysGn/hMxsWMeOI7rxHeMz40gebo3UyTs39SlSJuG7awU4Q/ezNQ8jNye2+CudG8TVzyzdo1A==
+
 react-native-reanimated@^1.13.2:
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.13.2.tgz#1ae5457b24b4913d173a5a064bb28eae7783d293"
@@ -6117,6 +6122,11 @@ react-native-spinkit@^1.5.1:
   integrity sha512-XkTgP4e+/MZpbI1GdZTIEQ+6WeMWQT4duWnSiXaaVW7py0rtaBLswtAEA6uXQGUhnxMnPWZhbLz7QponpH3ciQ==
   dependencies:
     prop-types "^15.5.8"
+
+react-native-splash-screen@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.2.0.tgz#d47ec8557b1ba988ee3ea98d01463081b60fff45"
+  integrity sha512-Ls9qiNZzW/OLFoI25wfjjAcrf2DZ975hn2vr6U9gyuxi2nooVbzQeFoQS5vQcbCt9QX5NY8ASEEAtlLdIa6KVg==
 
 react-native-tab-view@^2.15.2:
   version "2.15.2"

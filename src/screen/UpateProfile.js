@@ -66,7 +66,7 @@ class UpdateProfile extends Component {
         } catch (err) {
           console.log(err)
           await this.setState({ isLoading: false })
-          showingMessage(`${form} failed to update`, this.props.auth.errorMsg)
+          showingMessage(`Picture failed to update`, this.props.auth.errorMsg)
         }
       }
     })
@@ -102,7 +102,7 @@ class UpdateProfile extends Component {
         } catch (err) {
           console.log(err)
           await this.setState({ isLoading: false })
-          showingMessage(`${form} failed to update`, this.props.auth.errorMsg)
+          showingMessage(`Picture failed to update`, this.props.auth.errorMsg)
         }
       }
     })
