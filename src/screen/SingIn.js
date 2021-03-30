@@ -21,7 +21,6 @@ class SignIn extends Component {
     this.setState({ [key]: value })
   }
   async submitLogin () {
-
     const { email, password } = this.state
     this.setState({ isLoading: true })
     await this.props.login(email, password)

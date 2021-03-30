@@ -5,104 +5,104 @@ import Sort from '../assets/images/logo/sort.png'
 import SortDesc from '../assets/images/logo/sort-desc.png'
 import RNPickerSelect from 'react-native-picker-select'
 import { TouchableOpacity, FlatList } from 'react-native'
-import spide from '../assets/spider-movie.png'
 import http from '../helper/http'
 import { API_URL } from '@env'
 import { parsingDMY } from '../helper/date'
+import { connect } from 'react-redux'
+import { getMovie } from '../redux/actions/movie'
 
 class ViewAll extends Component {
   state = {
-    sort: 'ASC',
-    sortValue: null,
     movies: [],
-    search: '',
-    page: 1,
-    refreshing: false
+    refreshing: false,
+    query: {
+      page: 1,
+      search: '',
+      order: 'ASC',
+      sort: ''
+    }
   }
 
   componentDidMount () {
+    // this.setState({ movies: [] })
     this.fetchData()
   }
 
-  async fetchData () {
+  async fetchData (value) {
     const { status } = this.props.route.params
-    const response = await http().get(`movies?status=${status}`)
-    await this.setState({ movies: response.data.pageInfo.results })
+    // const response = await http().get(`movies?status=${status}`)
+    await this.props.getMovie({ status, ...value })
+    const { movieNowShowing, movieUpcoming } = this.props.movie
+    if (status === 'released') {
+      await this.setState({ movies: movieNowShowing.results })
+    } else {
+      await this.setState({ movies: movieUpcoming.results })
+    }
   }
-  async onChange (search) {
-    const { status } = this.props.route.params
-    this.setState({ search: search })
 
-    const response = await http().get(`movies?status=${status}&search=${this.state.search}`)
-    await this.setState({ movies: response.data.pageInfo.results })
+  async fetchDataNextData (value) {
+    const { status } = this.props.route.params
+    const { query } = this.state
+    await this.setState({
+      query: {
+        ...query,
+        page: query.page + 1
+      }
+    })
+    await this.props.getMovie({ status, ...this.state.query })
+    const { movieNowShowing, movieUpcoming } = this.props.movie
+    if (status === 'released') {
+      await this.setState({ movies: [...this.state.movies, ...movieNowShowing.results] })
+    } else {
+      await this.setState({ movies: [...this.state.movies, ...movieUpcoming.results] })
+    }
+  }
+
+  async onChange (search) {
+    this.setState({
+      query: {
+        ...this.state.query,
+        search: search
+      }
+    })
+
+    this.fetchData({ search: search })
   }
 
   async nextPage () {
     const { status } = this.props.route.params
-    const { page } = this.state
-    const response = await http().get(`movies?status=${status}&page=${page + 1}`)
-    await this.setState({ movies: [...this.state.movies, ...response.data.pageInfo.results] })
-    await this.setState({ page: page + 1 })
-  }
-
-  async changeSort () {
-    const { sort, sortValue } = await this.state
-    console.log(sort)
-    if (sortValue === 'title') {
-      if (sort === 'ASC') {
-        let sortData
-        await this.setState({ sort: 'DESC' })
-        sortData = this.state.movies.sort((a, b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0))
-        this.setState({ movies: sortData })
-      } else {
-        let sortData
-        await this.setState({ sort: 'ASC' })
-        sortData = this.state.movies.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
-        this.setState({ movies: sortData })
+    const { movieNowShowing, movieUpcoming } = this.props.movie
+    if (status === 'released') {
+      if (movieNowShowing.totalPage >= this.state.query.page) {
+        this.fetchDataNextData()
       }
-    } else if (sortValue === 'releaseDate') {
-      if (sort === 'ASC') {
-        let sortData
-        await this.setState({ sort: 'DESC' })
-        sortData = this.state.movies.sort((a, b) => (a.releaseDate < b.releaseDate) ? 1 : ((b.releaseDate < a.releaseDate) ? -1 : 0))
-        this.setState({ movies: sortData })
-      } else {
-        let sortData
-        await this.setState({ sort: 'ASC' })
-        sortData = this.state.movies.sort((a, b) => (a.releaseDate > b.releaseDate) ? 1 : ((b.releaseDate > a.releaseDate) ? -1 : 0))
-        this.setState({ movies: sortData })
+    } else {
+      if (movieUpcoming.totalPage >= this.state.query.page) {
+        this.fetchDataNextData()
       }
     }
-
   }
 
   async sort (value) {
-    await this.setState({ sortValue: value })
-    console.log(this.state.sortValue)
-    const { sort, sortValue } = await this.state
-
-    if (sortValue === 'title') {
-      if (sort === 'ASC') {
-        let sortData
-        sortData = this.state.movies.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
-        this.setState({ movies: sortData })
-      } else {
-        let sortData
-        sortData = this.state.movies.sort((a, b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0))
-        this.setState({ movies: sortData })
+    await this.setState({
+      query: {
+        ...this.state.query,
+        order: 'ASC',
+        sort: value
       }
-    } else if (sortValue === 'releaseDate') {
-      if (sort === 'ASC') {
-        let sortData
-        sortData = this.state.movies.sort((a, b) => (a.releaseDate > b.releaseDate) ? 1 : ((b.releaseDate > a.releaseDate) ? -1 : 0))
-        this.setState({ movies: sortData })
-      } else {
-        let sortData
-        sortData = this.state.movies.sort((a, b) => (a.releaseDate < b.releaseDate) ? 1 : ((b.releaseDate < a.releaseDate) ? -1 : 0))
-        this.setState({ movies: sortData })
-      }
-    }
+    })
+    await this.fetchData(this.state.query)
+  }
 
+  async changeOrder () {
+    const order = this.state.query.order === 'ASC' ? 'DESC' : 'ASC'
+    await this.setState({
+      query: {
+        ...this.state.query,
+        order
+      }
+    })
+    await this.fetchData(this.state.query)
   }
   render () {
     return (
@@ -112,13 +112,12 @@ class ViewAll extends Component {
             <InputSearch
               placeholder='Search Movie'
               onChangeText={(search) => this.onChange(search)}
-            // onChangeText={(value) => this.onChangeSearch(value)}
             />
             <Icon source={Search} />
           </FlexRowBetween>
           <FlexRowWrap>
-            <TouchableOpacity onPress={() => this.changeSort()} disabled={this.state.sortValue === null ? true : false}>
-              <Icon source={this.state.sort === 'ASC' ? Sort : SortDesc} />
+            <TouchableOpacity onPress={() => this.changeOrder()} disabled={this.state.query.sortValue === null ? true : false}>
+              <Icon source={this.state.query.sort === 'ASC' ? Sort : SortDesc} />
             </TouchableOpacity>
             <SelectPicker>
               <RNPickerSelect
@@ -141,7 +140,6 @@ class ViewAll extends Component {
                 }}
                 InputAccessoryView={() => null}
                 Icon={() => { return <></> }}
-              // value={this.state.favSport2}
               />
             </SelectPicker>
           </FlexRowWrap>
@@ -226,4 +224,9 @@ const FlexColum = styled.View`
   flex-direction: column
   align-items: flex-start
 `
-export default ViewAll
+
+const mapStateToProps = (state) => ({
+  movie: state.movie
+})
+const mapDispatchToProps = { getMovie }
+export default connect(mapStateToProps, mapDispatchToProps)(ViewAll)

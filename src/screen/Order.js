@@ -218,6 +218,8 @@ class Order extends Component {
               onPress={() => this.showModal()}
               height={'40px'}
               radius={'5px '}
+              disabled={this.props.order.seatSelected.length === 0}
+              color={this.props.order.seatSelected.length === 0 ? '#D8CCFA' : null}
             >Checkout</ButtonCheckout>
           </Container>
 
