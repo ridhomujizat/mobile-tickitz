@@ -5,7 +5,7 @@ import Sort from '../assets/images/logo/sort.png'
 import SortDesc from '../assets/images/logo/sort-desc.png'
 import RNPickerSelect from 'react-native-picker-select'
 import { TouchableOpacity, FlatList } from 'react-native'
-import http from '../helper/http'
+import Spinner from 'react-native-spinkit'
 import { API_URL } from '@env'
 import { parsingDMY } from '../helper/date'
 import { connect } from 'react-redux'
@@ -14,7 +14,7 @@ import { getMovie } from '../redux/actions/movie'
 class ViewAll extends Component {
   state = {
     movies: [],
-    refreshing: false,
+    loading: false,
     query: {
       page: 1,
       search: '',
@@ -30,7 +30,7 @@ class ViewAll extends Component {
 
   async fetchData (value) {
     const { status } = this.props.route.params
-    // const response = await http().get(`movies?status=${status}`)
+    this.setState({ loading: true })
     await this.props.getMovie({ status, ...value })
     const { movieNowShowing, movieUpcoming } = this.props.movie
     if (status === 'released') {
@@ -38,11 +38,13 @@ class ViewAll extends Component {
     } else {
       await this.setState({ movies: movieUpcoming.results })
     }
+    this.setState({ loading: false })
   }
 
   async fetchDataNextData (value) {
     const { status } = this.props.route.params
     const { query } = this.state
+    this.setState({ loading: true })
     await this.setState({
       query: {
         ...query,
@@ -56,6 +58,7 @@ class ViewAll extends Component {
     } else {
       await this.setState({ movies: [...this.state.movies, ...movieUpcoming.results] })
     }
+    this.setState({ loading: false })
   }
 
   async onChange (search) {
@@ -65,8 +68,9 @@ class ViewAll extends Component {
         search: search
       }
     })
-
-    this.fetchData({ search: search })
+    this.setState({ loading: true })
+    await this.fetchData({ search: search })
+    this.setState({ loading: false })
   }
 
   async nextPage () {
@@ -149,6 +153,17 @@ class ViewAll extends Component {
           keyExtractor={(item, index) => String(index)}
           onEndReached={() => this.nextPage()}
           onEndReachedThreshold={0.1}
+          ListFooterComponent={() => {
+            if (this.state.loading) {
+              return (
+                <SpinnerWrapper>
+                  <Spinner isVisible={true} size={50} type='Wave' color='#6E7191' />
+                </SpinnerWrapper>
+              )
+            } else {
+              return null
+            }
+          }}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => this.props.navigation.navigate('DetailMovie', { slug: item.slug })}
@@ -224,7 +239,10 @@ const FlexColum = styled.View`
   flex-direction: column
   align-items: flex-start
 `
-
+const SpinnerWrapper = styled.View`
+  padding: 30px
+  align-items: center
+`
 const mapStateToProps = (state) => ({
   movie: state.movie
 })

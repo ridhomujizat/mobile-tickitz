@@ -34,7 +34,6 @@ export const updateProfile = (token, data) => {
     }
     try {
       const response = await http(token).patch('profile', form)
-      console.log(response.data)
       dispatch({
         type: 'UPDATE_PROFILE',
         payload: {
@@ -49,12 +48,49 @@ export const updateProfile = (token, data) => {
         payload: response.data.message
       })
     } catch (err) {
-      const { message } = err.response.data
-      console.log(err)
+      if (err.response) {
+        const { message } = err.response.data
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: message
+        })
+      } else {
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: 'Cant connect with server'
+        })
+      }
+    }
+  }
+}
+
+export const deleteImage = (token) => {
+  return async dispatch => {
+    try {
+      const response = await http(token).delete('profile/image')
       dispatch({
-        type: 'SET_LOGIN_MESSAGE',
-        payload: message
+        type: 'UPDATE_PROFILE',
+        payload: {
+          image: 'uploads/profile/profile-default.jpg'
+        }
       })
+      dispatch({
+        type: 'SUCCESS_MESSAGE',
+        payload: response.data.message
+      })
+    } catch (err) {
+      if (err.response) {
+        const { message } = err.response.data
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: message
+        })
+      } else {
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: 'Cant connect with server'
+        })
+      }
     }
   }
 }

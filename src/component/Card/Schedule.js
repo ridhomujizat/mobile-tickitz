@@ -6,7 +6,7 @@ import Button from '../Button'
 import { useNavigation } from '@react-navigation/native'
 import { API_URL } from '@env'
 import { parsingDM } from '../../helper/date'
-
+import rupiah from '../../helper/rupiah'
 import { connect } from 'react-redux'
 import { selectTime } from '../../redux/actions/order'
 
@@ -52,7 +52,7 @@ function Schedule (props) {
       </TimesWrapper>
       <ViewFlexRow>
         <PriceLabel>Price</PriceLabel>
-        <Label>{props.price}</Label>
+        <Label>Rp {rupiah(props.price)}</Label>
       </ViewFlexRow>
       <ViewFlexRow>
         <Button

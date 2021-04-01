@@ -13,30 +13,20 @@ export const login = (email, password) => {
       })
       const result = await http().post('login', params)
       const token = jwtDecode(result.data.token)
-      try {
-        const resultProfile = await http(result.data.token).get('profile')
-        dispatch({
-          type: 'LOGIN',
-          payload: {
-            token: result.data.token,
-            name: resultProfile.data.results.firstName,
-            lastName: resultProfile.data.results.lastName,
-            image: resultProfile.data.results.image,
-            phone: resultProfile.data.results.phone,
-            role: token.role,
-            email: email
-          }
-        })
-      } catch (err) {
-        dispatch({
-          type: 'LOGIN',
-          payload: {
-            token: result.data.token,
-            role: token.role,
-            email: email
-          }
-        })
-      }
+      const resultProfile = await http(result.data.token).get('profile')
+      const profile = resultProfile.data.results
+      dispatch({
+        type: 'LOGIN',
+        payload: {
+          token: result.data.token,
+          name: profile.firstName === null ? 'Tickitzer' : profile.firstName,
+          lastName: profile.lastName === null ? '' : profile.lastName,
+          image: profile.image === null ? 'uploads/profile/profile-default.jpg' : profile.image,
+          phone: profile.phone === null ? '' : profile.phone,
+          role: token.role,
+          email: email
+        }
+      })
     } catch (err) {
       if (err.response) {
         const { message } = err.response.data
@@ -47,7 +37,7 @@ export const login = (email, password) => {
       } else {
         dispatch({
           type: 'SET_LOGIN_MESSAGE',
-          payload: 'Server error'
+          payload: 'Cant connect with server'
         })
       }
     }
@@ -61,20 +51,63 @@ export const register = (email, password) => {
     params.append('password', password)
     try {
       dispatch({
-        type: 'SET_LOGIN_MESSAGE',
-        payload: ''
+        type: 'CLEAN_MESSAGE'
       })
-      const result = await http().post('register', params)
+      const response = await http().post('register?device=mobile-app', params)
       dispatch({
         type: 'SUCCESS_MESSAGE',
-        payload: result.data.message
+        payload: response.data.message
       })
     } catch (err) {
-      const { message } = err.response.data
-      dispatch({
-        type: 'SET_LOGIN_MESSAGE',
-        payload: message
-      })
+      if (err.response) {
+        const { message } = err.response.data
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: message
+        })
+      } else {
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: 'Cant connect with server'
+        })
+      }
     }
+  }
+}
+
+export const forgetPass = (email) => {
+  return async dispatch => {
+    const params = new URLSearchParams()
+    params.append('email', email)
+    try {
+      dispatch({
+        type: 'CLEAN_MESSAGE'
+      })
+      const response = await http().post('forget-password?device=mobile-app', params)
+      dispatch({
+        type: 'SUCCESS_MESSAGE',
+        payload: response.data.message
+      })
+    } catch (err) {
+      if (err.response) {
+        const { message } = err.response.data
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: message
+        })
+      } else {
+        dispatch({
+          type: 'SET_LOGIN_MESSAGE',
+          payload: 'Cant connect with server'
+        })
+      }
+    }
+  }
+}
+export const cleanMessage = () => {
+  return async dispatch => {
+    dispatch({
+      type: 'CLEAN_MESSAGE'
+    })
   }
 }

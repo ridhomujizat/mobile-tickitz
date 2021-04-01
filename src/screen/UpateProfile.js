@@ -13,7 +13,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { API_URL } from '@env'
 import { connect } from 'react-redux'
-import { updateProfile } from '../redux/actions/profile'
+import { updateProfile, deleteImage } from '../redux/actions/profile'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const validationSchema = Yup.object().shape({
@@ -108,6 +108,21 @@ class UpdateProfile extends Component {
     })
   }
 
+  deleteImage = async () => {
+    try {
+      const { token } = this.props.auth
+      this.showModal()
+      await this.setState({ isLoading: true })
+      await this.props.deleteImage(token)
+      await this.setState({ isLoading: false })
+      showingMessage('Profile Update success', 'Delete image profole success', 'success')
+    } catch (err) {
+
+      await this.setState({ isLoading: false })
+      showingMessage(`Picture failed to update`, this.props.auth.errorMsg)
+    }
+  }
+
   updateProfile = async (values, form) => {
     const { token } = this.props.auth
     this.setState({ isLoading: true })
@@ -121,12 +136,7 @@ class UpdateProfile extends Component {
       showingMessage(`${form} failed to update`, this.props.auth.errorMsg,)
     }
   }
-  updateData = async () => {
-    const { token } = this.props.auth
-    const { image, ...data } = this.state.profile
-    console.log(data)
-    console.log(token)
-  }
+
   passwordValidation (values) {
     const errors = {}
     const { password, validPassword } = values
@@ -182,6 +192,7 @@ class UpdateProfile extends Component {
                   height='45px'
                   radius='8px'
                   color='#ff7570'
+                  onPress={() => this.deleteImage()}
                 > Delete Profile Picture </BottomPicker>
               </PickCamera>
             </ConfirmationWrapper>
@@ -460,5 +471,5 @@ const BottomPicker = styled(Button)`
 const mapStateToProps = (state) => ({
   auth: state.auth
 })
-const mapDispatchToProps = { updateProfile }
+const mapDispatchToProps = { updateProfile, deleteImage }
 export default connect(mapStateToProps, mapDispatchToProps)(UpdateProfile)

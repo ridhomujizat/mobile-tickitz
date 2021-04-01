@@ -6,6 +6,7 @@ import persistedStore from './redux/store'
 import { PersistGate } from 'redux-persist/integration/react'
 import FlashMessage from 'react-native-flash-message'
 import PushNotification from 'react-native-push-notification'
+import Linking from './routes/Linking'
 
 PushNotification.createChannel(
   {
@@ -25,7 +26,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <NavigationContainer>
+        <NavigationContainer linking={Linking}>
           <Router />
           <FlashMessage position="top" />
         </NavigationContainer>

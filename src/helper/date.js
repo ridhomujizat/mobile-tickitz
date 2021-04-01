@@ -1,11 +1,11 @@
-const month = ['January', 'Febuary', 'March', 'April', 'May', 'Juny', 'July', 'August', 'August', 'September', 'October', 'November', 'December']
+const month = ['January', 'Febuary', 'March', 'April', 'May', 'Juny', 'July', 'August', 'September', 'October', 'November', 'December']
 
 const MonthUpComing = (mountMonth) => {
   const current = new Date()
   const resultMonth = []
   for (let i = 0; i < mountMonth; i++) {
     current.setMonth(current.getMonth() + 1)
-    const nextMonth = current.getMonth().toLocaleString()
+    const nextMonth = current.getMonth()
     resultMonth.push(month[nextMonth])
   }
   return resultMonth

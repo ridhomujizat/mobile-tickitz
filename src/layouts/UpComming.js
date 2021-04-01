@@ -4,24 +4,38 @@ import { View, TouchableOpacity } from 'react-native'
 import { UpComingCard } from '../component/Card'
 import Button from '../component/Button'
 import { MonthUpComing } from '../helper/date'
-import http from '../helper/http'
 import Spinner from 'react-native-spinkit'
 import { useNavigation } from '@react-navigation/native'
+import { connect } from 'react-redux'
+import { getMovie } from '../redux/actions/movie'
 
-function NowShowing () {
-  const [movie, setMovie] = useState([])
+function UpComing (props) {
   const [month] = useState(MonthUpComing(6))
   const [isLoading, stopLoading] = useState(true)
   const navigation = useNavigation()
+  const [clicked, setClicked] = useState('')
 
   useEffect(() => {
     async function fetchData () {
-      const response = await http().get('movies?status=upcoming')
-      await setMovie(response.data.pageInfo.results)
+      await props.getMovie({ status: 'upcoming' })
       stopLoading(false)
     }
     fetchData()
   }, [])
+  async function fetchData () {
+    await props.getMovie({ status: 'upcoming' })
+    stopLoading(false)
+  }
+  const monthUpcoming = async (value) => {
+    if (clicked !== value) {
+      setClicked(value)
+      const monthNumber = month.indexOf(value) + 1
+      await props.getMovie({ status: 'upcoming', month: monthNumber })
+    } else {
+      fetchData()
+      setClicked('')
+    }
+  }
   const renderItem = ({ item }) => (
     <UpComingCard
       title={item.title}
@@ -30,14 +44,33 @@ function NowShowing () {
       genre={item.genre}
     />
   )
-  const renderButton = ({ item }) => (
-    <ButtonMonth
-      radius={'4px'}
-      fontSize={'16px'}
-      height={'42px'}
-      width={'100px'}
-    >{item}</ButtonMonth>
-  )
+  const renderButton = ({ item }) => {
+    if (clicked === item) {
+      return (
+        <ButtonMonth
+          radius={'4px'}
+          fontSize={'16px'}
+          height={'42px'}
+          width={'110px'}
+          onPress={(value) => monthUpcoming(`${item}`)}
+        >{item}</ButtonMonth>
+      )
+    } else {
+      return (
+        <ButtonMonth
+          radius={'4px'}
+          fontSize={'16px'}
+          height={'42px'}
+          width={'110px'}
+          color={'#fff'}
+          fontColor={'#5F2EEA'}
+          border={'solid 1px #5F2EEA'}
+          onPress={(value) => monthUpcoming(`${item}`)}
+        >{item}</ButtonMonth>
+      )
+    }
+  }
+
   return (
     <Row>
       <RowText>
@@ -58,14 +91,16 @@ function NowShowing () {
         ListFooterComponent={<PaddingRight />}
       />
       {isLoading
-        ? (<Spinner isVisible={true} size={50} type='Wave' color='#6E7191' />)
-        : (<ContainerCard
-          horizontal
-          data={movie}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderItem}
-          ListFooterComponent={<PaddingRight />}
-        />)}
+        ? (<WrapperIndicator><Spinner isVisible={true} size={50} type='Wave' color='#6E7191' /></WrapperIndicator>)
+        : (props.movie.errorMessage
+          ? <WrapperIndicator><TextError>{props.movie.errorMessage}</TextError></WrapperIndicator>
+          : <ContainerCard
+            horizontal
+            data={props.movie.movieUpcoming.results}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={renderItem}
+            ListFooterComponent={<PaddingRight />}
+          />)}
     </Row>
   )
 }
@@ -89,6 +124,10 @@ const TextViewAll = styled(Text)`
   font-family: Mulish-Medium
   color: #5F2EEA
 `
+const TextError = styled.Text`
+  font-size: 18px
+  font-family: Mulish-Medium
+`
 const ContainerCard = styled.FlatList`
   padding-horizontal: 30px
 `
@@ -99,5 +138,13 @@ const ButtonMonth = styled(Button)`
   margin-right: 5px
   margin-Bottom: 10px
 `
+const WrapperIndicator = styled.View`
+  align-items: center
+  height: 90px
+`
 
-export default NowShowing
+const mapStateToProps = (state) => ({
+  movie: state.movie
+})
+const mapDispatchToProps = { getMovie }
+export default connect(mapStateToProps, mapDispatchToProps)(UpComing)

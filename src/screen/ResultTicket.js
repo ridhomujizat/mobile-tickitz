@@ -6,6 +6,8 @@ import { parsingDM } from '../helper/date'
 import { connect } from 'react-redux'
 import http from '../helper/http'
 import Loading from '../component/LoadingScreen'
+import rupiah from '../helper/rupiah'
+import { useNavigation } from '@react-navigation/native'
 
 function ResultTicket (props) {
   const [ticket, setTicket] = useState({
@@ -70,7 +72,7 @@ function ResultTicket (props) {
             </FlexRow>
             <FlexRowTotal>
               <Text>Total</Text>
-              <Text>{ticket.total}</Text>
+              <Text>Rp {rupiah(ticket.total)}</Text>
             </FlexRowTotal>
           </WrapperTicketInfo>
         </Card>

@@ -12,6 +12,7 @@ import ovo from '../assets/images/peyment-method/ovo.png'
 import visa from '../assets/images/peyment-method/visa.png'
 import paypal from '../assets/images/peyment-method/paypal.png'
 import { TouchableOpacity, View } from 'react-native'
+import rupiah from '../helper/rupiah'
 import Footer from '../component/Footer'
 import http from '../helper/http'
 import Loading from '../component/LoadingScreen'
@@ -120,7 +121,7 @@ class Payment extends Component {
           <Wrapper space='20px'>
             <RowSpaceBetween >
               <TotalLabel>Total Payment</TotalLabel>
-              <Text>{this.state.order.total}</Text>
+              <Text>Rp {rupiah(this.state.order.total)}</Text>
             </RowSpaceBetween>
           </Wrapper>
           <ContainerWrapper>

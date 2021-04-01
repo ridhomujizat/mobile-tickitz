@@ -9,7 +9,7 @@ import Footer from '../component/Footer'
 import Loading from '../component/LoadingScreen/whiteLoading'
 import { parsingDM } from '../helper/date'
 import { showingMessage } from '../helper/flashMessage'
-
+import rupiah from '../helper/rupiah'
 import { connect } from 'react-redux'
 import http from '../helper/http'
 import { removeSeat, selectSeat, createTransaction } from '../redux/actions/order'
@@ -91,7 +91,7 @@ class Order extends Component {
                   <RowWrapperFluid>
                     <LabelConfim>One ticket price</LabelConfim>
                     <ChoosedTextWrapper>
-                      <OrderText>{this.props.order.price}</OrderText>
+                      <OrderText>Rp {rupiah(this.props.order.price)}</OrderText>
                     </ChoosedTextWrapper>
                   </RowWrapperFluid>
                   <RowWrapperFluid>
@@ -103,7 +103,7 @@ class Order extends Component {
                   <RowWrapperFluid>
                     <Label>Total</Label>
                     <ChoosedTextWrapper>
-                      <ChoosedText>{this.props.order.total}</ChoosedText>
+                      <ChoosedText>Rp {rupiah(this.props.order.total)}</ChoosedText>
                     </ChoosedTextWrapper>
                   </RowWrapperFluid>
                 </OrderInfo>

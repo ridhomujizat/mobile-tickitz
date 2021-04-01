@@ -5,16 +5,16 @@ import { NowShowingCard } from '../component/Card'
 import http from '../helper/http'
 import Spinner from 'react-native-spinkit'
 import { useNavigation } from '@react-navigation/native'
+import { connect } from 'react-redux'
+import { getMovie } from '../redux/actions/movie'
 
-function NowShowing () {
-  const [movie, setMovie] = useState([])
+function NowShowing (props) {
   const [isLoading, stopLoading] = useState(true)
   const navigation = useNavigation()
 
   useEffect(() => {
     async function fetchData () {
-      const response = await http().get('movies?status=released')
-      await setMovie(response.data.pageInfo.results)
+      await props.getMovie({ status: 'released' })
       stopLoading(false)
     }
     fetchData()
@@ -41,14 +41,16 @@ function NowShowing () {
         </TouchableOpacity>
       </RowText>
       {isLoading
-        ? (<Spinner isVisible={true} size={50} type='Wave' color='#6E7191' />)
-        : (<ContainerCard
-          horizontal
-          data={movie}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderItem}
-          ListFooterComponent={<PaddingRight />}
-        />)}
+        ? (<WrapperIndicator><Spinner isVisible={true} size={50} type='Wave' color='#6E7191' /></WrapperIndicator>)
+        : (props.movie.errorMessage
+          ? <WrapperIndicator><TextError>{props.movie.errorMessage}</TextError></WrapperIndicator>
+          : <ContainerCard
+            horizontal
+            data={props.movie.movieNowShowing.results}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={renderItem}
+            ListFooterComponent={<PaddingRight />}
+          />)}
     </Row>
   )
 }
@@ -72,11 +74,23 @@ const TextViewAll = styled(Text)`
   font-size: 14px
   font-family: Mulish-Medium
 `
+const TextError = styled.Text`
+  font-size: 18px
+  font-family: Mulish-Medium
+`
 const ContainerCard = styled.FlatList`
   padding-horizontal: 30px
 `
 const PaddingRight = styled.View`
   width: 50px
 `
-
-export default NowShowing
+const WrapperIndicator = styled.View`
+  align-items: center
+  justify-content: center
+  height: 90px
+`
+const mapStateToProps = (state) => ({
+  movie: state.movie
+})
+const mapDispatchToProps = { getMovie }
+export default connect(mapStateToProps, mapDispatchToProps)(NowShowing)

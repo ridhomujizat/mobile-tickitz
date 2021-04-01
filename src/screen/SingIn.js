@@ -7,24 +7,39 @@ import Button from '../component/Button'
 import { TouchableOpacity, View } from 'react-native'
 import DimmedLoading from '../component/LoadingScreen/whiteLoading'
 import { showingMessage } from '../helper/flashMessage'
-
 import { connect } from 'react-redux'
 import { login } from '../redux/actions/auth'
+import * as Yup from 'yup'
+import { Formik } from 'formik'
 
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('*Must be a valid email address')
+    .max(50, '*Email must be less than 100 characters')
+    .required('*Email is required'),
+  password: Yup.string()
+    .min(8, '*Password must have at least 8 characters')
+    .required('Password is required')
+})
 class SignIn extends Component {
   state = {
-    email: '',
-    password: '',
     isLoading: false
   }
-  onChange (key, value) {
-    this.setState({ [key]: value })
+
+  componentDidMount () {
+    if (this.props.route.params) {
+      const { activate } = this.props.route.params
+      if (activate) {
+        showingMessage("Activate Success", "You can sign with your account right now", 'success')
+      } else {
+        showingMessage("Activate failed", "Sign up with another email")
+      }
+    }
   }
-  async submitLogin () {
-    const { email, password } = this.state
+  async submitLogin (values) {
+    const { email, password } = values
     this.setState({ isLoading: true })
     await this.props.login(email, password)
-
     if (this.props.auth.token) {
       await showingMessage("Login Success", "Happy Wathcing", 'success')
       this.setState({ isLoading: false })
@@ -42,20 +57,52 @@ class SignIn extends Component {
             <View>
               <LogoPurple width={'80px'} height={'40px'} disabled />
               <TitleLarge>Sign In</TitleLarge>
-              <InputText
-                label='Email'
-                placeholder='Write your email'
-                autoCompleteType='email'
-                keyboardType='email-address'
-                textContentType='emailAddress'
-                onChangeText={(email) => this.onChange('email', email)}
-              />
-              <PasswordInput
-                label='Password'
-                placeholder='Write your Password'
-                onChangeText={(password) => this.onChange('password', password)}
-              />
-              <Button onPress={() => this.submitLogin()}>Sign In</Button>
+              <Formik
+                initialValues={{ email: '', password: '' }}
+                validationSchema={validationSchema}
+                onSubmit={Values => this.submitLogin(Values)}
+              >
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                  isValid,
+                  touched
+                }) => (
+                  <>
+                    <InputText
+                      label='Email'
+                      placeholder='Write your email'
+                      autoCompleteType='email'
+                      keyboardType='email-address'
+                      textContentType='emailAddress'
+                      value={values.email}
+                      onChangeText={handleChange('email')}
+                      onBlur={handleBlur('email')}
+                    />
+                    {errors.email && touched.email
+                      ? <TextError>{errors.email}</TextError>
+                      : null}
+                    <PasswordInput
+                      label='Password'
+                      placeholder='Write your Password'
+                      value={values.password}
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
+                    />
+                    {errors.password && touched.password
+                      ? <TextError>{errors.password}</TextError>
+                      : null}
+                    <ButtonSign
+                      onPress={handleSubmit}
+                      disabled={!isValid}
+                      color={!isValid || values.email === '' || values.password === '' ? '#D8CCFA' : null}
+                    >Sign In</ButtonSign>
+                  </>
+                )}
+              </Formik>
             </View>
             <ForgetPasswordRow >
               <View>
@@ -84,7 +131,6 @@ const TitleLarge = styled.Text`
 `
 const PasswordInput = styled(InputPassword)`
   margin-top: 24px
-  margin-bottom: 40px 
 `
 const ForgetPasswordQue = styled.Text`
   font-size: 16px
@@ -105,11 +151,15 @@ const ForgetPasswordText = styled(ForgetPasswordQue)`
   font-weight: 700
   font-family: Mulish-Medium
 `
-const ButtonQuickSign = styled.View`
- background-color: blue
- width: 48px
- height: 48px
- box-shadow: 0 0 10px yellow;
+
+const TextError = styled.Text`
+  font-family: Mulish-Medium
+  font-size: 12px
+  color: red
+`
+const ButtonSign = styled(Button)`
+  margin-top: 40px 
+
 `
 const mapStateToPros = state => ({
   auth: state.auth

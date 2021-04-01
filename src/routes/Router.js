@@ -12,6 +12,7 @@ import SignUp from '../screen/SignUp'
 import Ticket from '../screen/ResultTicket'
 import Profile from '../screen/Profile'
 import ViewAll from '../screen/ViewAll'
+import ChangePassword from '../screen/ChangePassword'
 import SplashScreen from 'react-native-splash-screen'
 import { connect } from 'react-redux'
 
@@ -44,6 +45,11 @@ function Router (props) {
               headerShown: false
             }}
             name='ForgetPassword' />
+          <Stack.Screen component={ChangePassword}
+            options={{
+              headerShown: false
+            }}
+            name='ChangePassword' />
         </>
       )}
 

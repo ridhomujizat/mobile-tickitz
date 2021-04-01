@@ -6,8 +6,8 @@ const initialState = {
   phone: '',
   role: null,
   email: null,
-  message: '',
-  errorMsg: ''
+  message: null,
+  errorMsg: null
 }
 
 const authReducer = (state = initialState, action) => {
@@ -34,6 +34,13 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         message: action.payload
+      }
+    }
+    case 'CLEAN_MESSAGE': {
+      return {
+        ...state,
+        message: null,
+        errorMsg: null
       }
     }
     case 'UPDATE_PROFILE': {
