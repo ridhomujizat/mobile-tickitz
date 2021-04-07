@@ -34,13 +34,14 @@ export const updateProfile = (token, data) => {
     }
     try {
       const response = await http(token).patch('profile', form)
+      const profile = response.data.result
       dispatch({
         type: 'UPDATE_PROFILE',
         payload: {
-          name: response.data.result.firstName,
-          lastName: response.data.result.lastName,
-          image: response.data.result.image,
-          phone: response.data.result.phone
+          name: profile.firstName === null ? 'Tickitzer' : profile.firstName,
+          lastName: profile.lastName === null ? '' : profile.lastName,
+          image: profile.image === null ? 'uploads/profile/profile-default.jpg' : profile.image,
+          phone: profile.phone === null ? '' : profile.phone
         }
       })
       dispatch({

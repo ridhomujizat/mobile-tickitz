@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import http from '../helper/http'
 import Loading from '../component/LoadingScreen'
 import rupiah from '../helper/rupiah'
-import { useNavigation } from '@react-navigation/native'
+import Button from '../component/Button'
 
 function ResultTicket (props) {
   const [ticket, setTicket] = useState({
@@ -76,6 +76,16 @@ function ResultTicket (props) {
             </FlexRowTotal>
           </WrapperTicketInfo>
         </Card>
+        <ButtonBack
+          height={'45px'}
+          color={'#fff'}
+          fontColor={'#5F2EEA'}
+          border={'solid 1px #5F2EEA'}
+          onPress={() => props.navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }]
+          })}
+        >Back to home</ButtonBack>
       </Container>
     </>
   )
@@ -90,6 +100,7 @@ const Card = styled.View`
   background-color: #fff
   border-radius: 16px
   position: relative
+  margin-bottom: 20px
 `
 const BarcodeWrapper = styled.View`
   height: 250px
@@ -154,6 +165,9 @@ const Text = styled.Text`
 font-family: Mulish-SemiBold
 font-size: 12px
 color: #14142B
+`
+const ButtonBack = styled(Button)`
+  margin-bottom : 60px
 `
 const mapStateToProps = (state) => ({
   auth: state.auth
