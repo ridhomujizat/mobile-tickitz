@@ -26,17 +26,17 @@ class SignUp extends Component {
     isLoading: false
   }
   async singUpSubmit (values) {
-    this.setState({ loaading: true })
+    await this.setState({ isLoading: true })
     await this.props.register(values.email, values.password)
 
     if (this.props.auth.message) {
       await showingMessage("Register Success", this.props.auth.message, 'success')
-      this.setState({ loaading: false })
+      this.setState({ isLoading: false })
     }
 
     if (this.props.auth.errorMsg) {
       await showingMessage("Register Failed", this.props.auth.errorMsg)
-      this.setState({ loaading: false })
+      this.setState({ isLoading: false })
     }
   }
   render () {
